@@ -457,7 +457,7 @@
     var isMobile = window.innerWidth <= 640;
     var todayDayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     var todayKey = todayDayNames[new Date().getDay()];
-    var defaultDay = isMobile && DAYS.indexOf(todayKey) !== -1 ? todayKey : 'all';
+    var defaultDay = 'all';
 
     dayTabButtons.forEach(function (t) {
       t.classList.remove('active');
