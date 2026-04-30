@@ -926,16 +926,53 @@
   var lightboxImg = document.getElementById('lightboxImg');
   var lightboxBackdrop = document.getElementById('lightboxBackdrop');
   var lightboxClose = document.getElementById('lightboxClose');
+  var lightboxPrev = document.getElementById('lightboxPrev');
+  var lightboxNext = document.getElementById('lightboxNext');
+  var currentLightboxStep = 0;
+  var totalSteps = 0;
 
-  function openLightbox(src, alt, instructions) {
+  function openLightbox(src, alt, instructions, stepNum) {
     if (!lightboxImg) return;
     lightboxImg.src = src || '';
     lightboxImg.alt = alt || 'Enlarged view';
     var instEl = document.getElementById('lightboxInstructions');
     if (instEl) instEl.textContent = instructions || '';
+    currentLightboxStep = stepNum || 0;
+    totalSteps = document.querySelectorAll('.direction-step:not([style*="display: none"])').length;
+    updateLightboxNavigation();
     lightbox.setAttribute('aria-hidden', 'false');
     lightbox.classList.add('open');
     if (lightboxClose) lightboxClose.focus();
+  }
+
+  function updateLightboxNavigation() {
+    if (lightboxPrev) lightboxPrev.style.display = currentLightboxStep > 1 ? 'block' : 'none';
+    if (lightboxNext) lightboxNext.style.display = currentLightboxStep < totalSteps ? 'block' : 'none';
+  }
+
+  function navigateLightbox(direction) {
+    var newStep = currentLightboxStep + direction;
+    if (newStep < 1 || newStep > totalSteps) return;
+    
+    var allSteps = document.querySelectorAll('.direction-step:not([style*="display: none"])');
+    var targetStep = null;
+    var stepCount = 0;
+    
+    for (var i = 0; i < allSteps.length; i++) {
+      stepCount++;
+      if (stepCount === newStep) {
+        targetStep = allSteps[i];
+        break;
+      }
+    }
+    
+    if (!targetStep) return;
+    
+    var img = targetStep.querySelector('img');
+    var stepNum = targetStep.dataset.step;
+    if (img && stepNum) {
+      openLightbox(img.src, img.alt, currentStepInstructions[parseInt(stepNum, 10) - 1] || '', newStep);
+    }
   }
 
   function closeLightbox() {
@@ -950,7 +987,15 @@
       var stepNum = step && step.dataset.step;
       if (stepNum) {
         e.preventDefault();
-        openLightbox(imgTarget.src, imgTarget.alt, currentStepInstructions[parseInt(stepNum, 10) - 1] || '');
+        var visibleSteps = document.querySelectorAll('.direction-step:not([style*="display: none"])');
+        var stepIndex = 0;
+        for (var i = 0; i < visibleSteps.length; i++) {
+          if (visibleSteps[i].dataset.step === stepNum) {
+            stepIndex = i + 1;
+            break;
+          }
+        }
+        openLightbox(imgTarget.src, imgTarget.alt, currentStepInstructions[parseInt(stepNum, 10) - 1] || '', stepIndex);
         return;
       }
     }
@@ -970,6 +1015,13 @@
 
   if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', closeLightbox);
   if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+  if (lightboxPrev) lightboxPrev.addEventListener('click', function () { navigateLightbox(-1); });
+  if (lightboxNext) lightboxNext.addEventListener('click', function () { navigateLightbox(1); });
+  lightbox.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') navigateLightbox(-1);
+    if (e.key === 'ArrowRight') navigateLightbox(1);
+  });
   lightbox.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeLightbox();
   });
