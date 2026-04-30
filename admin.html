@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard · Timetable</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script>
+    // Check authentication before rendering admin panel
+    (function () {
+      try {
+        var isAuthenticated = sessionStorage.getItem('admin_authenticated') === 'true';
+        if (!isAuthenticated) {
+          document.body.innerHTML = '';
+          document.body.className = 'auth-only';
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Authentication Modal -->
+  <div class="auth-modal" id="authModal" aria-labelledby="authTitle" role="dialog" aria-modal="true">
+    <div class="auth-modal-content">
+      <div class="auth-modal-header">
+        <h1 id="authTitle" class="auth-modal-title">Admin Dashboard</h1>
+        <p class="auth-modal-subtitle">Enter password to continue</p>
+      </div>
+      <form class="auth-form" id="authForm" onsubmit="return window.handleAdminAuth(event)">
+        <label for="adminPassword" class="auth-label">Password</label>
+        <input 
+          type="password" 
+          id="adminPassword" 
+          class="auth-input" 
+          placeholder="Enter admin password" 
+          required 
+          autocomplete="current-password"
+          aria-label="Admin password"
+        />
+        <div id="authError" class="auth-error" role="alert" aria-live="polite"></div>
+        <button type="submit" class="auth-button">Access Admin Panel</button>
+      </form>
+      <p class="auth-hint">
+        <a href="index.html" class="auth-back-link">← Back to Timetable</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="admin-app" id="adminApp" style="display: none;">
+    <header class="admin-header">
+      <div class="admin-header-inner">
+        <h1 class="admin-logo">Timetable Admin</h1>
+        <nav class="admin-nav" id="adminNav">
+          <button type="button" class="admin-tab" data-panel="semester" onclick="window.showPanel('semester')">Semester & year</button>
+          <button type="button" class="admin-tab active" data-panel="upload" onclick="window.showPanel('upload')">Upload data</button>
+          <button type="button" class="admin-tab" data-panel="courses" onclick="window.showPanel('courses')">Courses & timetables</button>
+          <button type="button" class="admin-tab" data-panel="lecturers" onclick="window.showPanel('lecturers')">Lecturers</button>
+          <button type="button" class="admin-tab" data-panel="venues" onclick="window.showPanel('venues')">Venue images</button>
+          <button type="button" class="admin-tab" data-panel="data" onclick="window.showPanel('data')">Data</button>
+        </nav>
+        <a href="index.html" class="admin-back">← Back to app</a>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <!-- Panel: Semester & year -->
+      <section class="admin-panel" id="panel-semester" aria-labelledby="heading-semester">
+        <h2 id="heading-semester" class="admin-panel-title">Semester & year</h2>
+        <p class="admin-panel-desc">Set the academic period shown to students (e.g. under “My Timetable” on the main app).</p>
+        <div class="semester-year-form">
+          <label>Semester
+            <select id="semesterSelect" class="semester-select">
+              <option value="1">1st Semester</option>
+              <option value="2">2nd Semester</option>
+            </select>
+          </label>
+          <label>Year
+            <input type="number" id="yearInput" class="year-input" min="2020" max="2030" value="2026" />
+          </label>
+        </div>
+        <p class="admin-hint">Preview: <strong id="semesterPreview">1st Semester 2026</strong></p>
+      </section>
+
+      <!-- Panel: Upload JSON -->
+      <section class="admin-panel active" id="panel-upload" aria-labelledby="heading-upload">
+        <h2 id="heading-upload" class="admin-panel-title">Upload timetable data</h2>
+        <p class="admin-panel-desc">Upload a JSON file from your university timetable scrape. Data will be merged with existing courses and lecturers. You can also upload a file with only <code>courses</code> or only <code>lecturers</code>.</p>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="jsonFileInput" accept=".json,application/json" hidden />
+          <p class="upload-zone-text">Drop JSON file here or <button type="button" class="upload-browse" id="uploadBrowse">browse</button></p>
+        </div>
+        <div class="upload-preview" id="uploadPreview" style="display: none;">
+          <h3 class="upload-preview-title">Preview</h3>
+          <pre class="upload-preview-json" id="uploadPreviewJson"></pre>
+          <p class="upload-preview-summary" id="uploadPreviewSummary"></p>
+          <div class="upload-actions">
+            <button type="button" class="btn btn-primary" id="uploadConfirm">Import into app</button>
+            <button type="button" class="btn btn-ghost" id="uploadCancel">Cancel</button>
+          </div>
+        </div>
+        <div class="upload-help">
+          <h4>Expected JSON format</h4>
+          <p>Your scraped file can use this structure (or we'll try to map common fields):</p>
+          <pre class="upload-help-code">{
+  "courses": [
+    {
+      "code": "IENDCY336",
+      "name": "Industrial Engineering · Year 3",
+      "timetable": [
+        { "day": "mon", "start": 8, "span": 1, "subject": "Mathematics", "venue": "Room 101 · Mr. Chen", "floor": 1, "type": "theory", "lecturerId": "chen" }
+      ]
+    }
+  ],
+  "lecturers": {
+    "chen": { "name": "John Chen", "office": "Room 101, Block A", "officeFloor": 1, "classBuilding": "Block A", "consultation": "...", "email": "..." }
+  }
+}</pre>
+          <p><a href="data-format.md" target="_blank" rel="noopener">Full format reference (data-format.md)</a></p>
+        </div>
+      </section>
+
+      <!-- Panel: Courses & timetables -->
+      <section class="admin-panel" id="panel-courses" aria-labelledby="heading-courses">
+        <h2 id="heading-courses" class="admin-panel-title">Courses & timetables</h2>
+        <p class="admin-panel-desc">Create or edit course timetables. Select a course to modify its slots and lecturer links.</p>
+        <div class="courses-toolbar">
+          <select id="courseSelect" class="course-select">
+            <option value="">Select a course…</option>
+          </select>
+          <button type="button" class="btn btn-secondary" id="courseAdd">Add course</button>
+          <button type="button" class="btn btn-ghost btn-small" id="courseDelete" style="display:none;">Delete course</button>
+        </div>
+        <div class="course-editor" id="courseEditor" style="display: none;">
+          <div class="course-editor-meta">
+            <label>Course code <input type="text" id="editCode" placeholder="e.g. IENDCY336" /></label>
+            <label>Display name <input type="text" id="editName" placeholder="e.g. Industrial Engineering · Year 3" /></label>
+          </div>
+          <h3>Timetable slots</h3>
+          <div class="slots-toolbar">
+            <button type="button" class="btn btn-small" id="slotAdd">+ Add slot</button>
+            <button type="button" class="btn btn-primary btn-small" id="courseSave">Save course</button>
+          </div>
+          <div class="slots-list" id="slotsList"></div>
+        </div>
+        <p class="admin-hint" id="coursesHint">Import data from the Upload tab first, or add a new course.</p>
+      </section>
+
+      <!-- Panel: Lecturers -->
+      <section class="admin-panel" id="panel-lecturers" aria-labelledby="heading-lecturers">
+        <h2 id="heading-lecturers" class="admin-panel-title">Lecturers</h2>
+        <p class="admin-panel-desc">Add or edit lecturers. You can import them via the <strong>Upload data</strong> tab (JSON with a <code>lecturers</code> object) or add them manually below.</p>
+        <div class="lecturers-toolbar">
+          <button type="button" class="btn btn-primary" id="lecturerAdd">+ Add lecturer</button>
+        </div>
+        <div class="lecturers-list" id="lecturersList"></div>
+        <div class="lecturer-editor" id="lecturerEditor" style="display: none;">
+          <h3 class="lecturer-editor-title" id="lecturerEditorTitle">New lecturer</h3>
+          <div class="lecturer-form">
+            <label>ID (used in timetable slots) <input type="text" id="lectId" placeholder="e.g. chen" /></label>
+            <label>Full name <input type="text" id="lectName" placeholder="e.g. John Chen" /></label>
+            <label>Title / subject <input type="text" id="lectTitle" placeholder="e.g. Mathematics" /></label>
+            <label>Office <input type="text" id="lectOffice" placeholder="e.g. Room 101, Block A" /></label>
+            <label>Office floor <input type="number" id="lectOfficeFloor" min="0" max="9" value="1" placeholder="0 = ground" /></label>
+            <label>Class building (for directions) <input type="text" id="lectClassBuilding" placeholder="e.g. Block A" /></label>
+            <label>Consultation hours <input type="text" id="lectConsultation" placeholder="e.g. Mon & Wed 14:00 – 16:00" /></label>
+            <label>Email <input type="email" id="lectEmail" placeholder="e.g. j.chen@school.edu" /></label>
+            <label>Photo URL (optional) <input type="text" id="lectPhoto" placeholder="https://..." /></label>
+          </div>
+          <div class="lecturer-editor-actions">
+            <button type="button" class="btn btn-primary" id="lecturerSave">Save</button>
+            <button type="button" class="btn btn-ghost" id="lecturerCancel">Cancel</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Venue images -->
+      <section class="admin-panel" id="panel-venues" aria-labelledby="heading-venues">
+        <h2 id="heading-venues" class="admin-panel-title">Venue images</h2>
+        <p class="admin-panel-desc">Add photos for “How to get there”: 1) Campus map, 2) Building, 3) Floor, 4) Door, 5) Inside. You can set default images or per-venue.</p>
+        <div class="venue-select-wrap">
+          <label>Venue set</label>
+          <select id="venueSetSelect" class="venue-set-select">
+            <option value="default">Default (all venues)</option>
+          </select>
+          <button type="button" class="btn btn-small" id="venueSetAdd">Add venue set</button>
+        </div>
+        <div class="venue-steps" id="venueSteps">
+          <div class="venue-step" data-step="1">
+            <span class="venue-step-label">1. Campus / map</span>
+            <div class="venue-step-preview" id="venuePreview1"></div>
+            <input type="file" id="venueFile1" accept="image/*" hidden />
+            <button type="button" class="btn btn-small venue-upload-btn" data-step="1">Upload image</button>
+            <input type="text" class="venue-step-instr" id="venueInstr1" placeholder="Instruction text (e.g. Enter via main gate)" />
+          </div>
+          <div class="venue-step" data-step="2">
+            <span class="venue-step-label">2. Building exterior</span>
+            <div class="venue-step-preview" id="venuePreview2"></div>
+            <input type="file" id="venueFile2" accept="image/*" hidden />
+            <button type="button" class="btn btn-small venue-upload-btn" data-step="2">Upload image</button>
+            <input type="text" class="venue-step-instr" id="venueInstr2" placeholder="Instruction text (e.g. Walk to Building 76)" />
+          </div>
+          <div class="venue-step" data-step="3">
+            <span class="venue-step-label">3. Floor</span>
+            <div class="venue-step-preview" id="venuePreview3"></div>
+            <input type="file" id="venueFile3" accept="image/*" hidden />
+            <button type="button" class="btn btn-small venue-upload-btn" data-step="3">Upload image</button>
+            <input type="text" class="venue-step-instr" id="venueInstr3" placeholder="Instruction text (e.g. Take stairs to floor 2)" />
+          </div>
+          <div class="venue-step" data-step="4">
+            <span class="venue-step-label">4. Room door</span>
+            <div class="venue-step-preview" id="venuePreview4"></div>
+            <input type="file" id="venueFile4" accept="image/*" hidden />
+            <button type="button" class="btn btn-small venue-upload-btn" data-step="4">Upload image</button>
+            <input type="text" class="venue-step-instr" id="venueInstr4" placeholder="Instruction text (e.g. Room 001 is on the left)" />
+          </div>
+          <div class="venue-step" data-step="5">
+            <span class="venue-step-label">5. Inside venue</span>
+            <div class="venue-step-preview" id="venuePreview5"></div>
+            <input type="file" id="venueFile5" accept="image/*" hidden />
+            <button type="button" class="btn btn-small venue-upload-btn" data-step="5">Upload image</button>
+            <input type="text" class="venue-step-instr" id="venueInstr5" placeholder="Instruction text (e.g. Sit in the front rows)" />
+          </div>
+        </div>
+        <p class="admin-hint">Images are stored in this browser and used by the student app from the same localStorage.</p>
+      </section>
+
+      <!-- Data management -->
+      <section class="admin-panel" id="panel-data" aria-labelledby="heading-data">
+        <h2 id="heading-data" class="admin-panel-title">Data management</h2>
+        <p class="admin-panel-desc">Export your data as JSON or clear everything to start fresh.</p>
+        <div class="data-actions">
+          <button type="button" class="btn btn-secondary" id="dataExport">Export all data (JSON)</button>
+          <button type="button" class="btn btn-ghost" id="dataClear" style="color:#e74c3c;">Clear all data</button>
+        </div>
+      </section>
+    </main>
+  </div>
+  <!-- End of admin-app -->
+
+  <script>
+    // Authentication handler
+    window.handleAdminAuth = function(event) {
+      event.preventDefault();
+      var passwordInput = document.getElementById('adminPassword');
+      var adminPassword = 'admin'; // Default password - change this to your desired password
+      var errorDiv = document.getElementById('authError');
+      
+      if (passwordInput.value === adminPassword) {
+        try {
+          sessionStorage.setItem('admin_authenticated', 'true');
+        } catch (e) {}
+        // Show admin panel
+        document.getElementById('authModal').style.display = 'none';
+        document.getElementById('adminApp').style.display = 'block';
+        passwordInput.value = '';
+        errorDiv.textContent = '';
+        return false;
+      } else {
+        errorDiv.textContent = 'Incorrect password. Please try again.';
+        passwordInput.value = '';
+        return false;
+      }
+    };
+
+    // Initialize auth on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      try {
+        var isAuthenticated = sessionStorage.getItem('admin_authenticated') === 'true';
+        if (isAuthenticated) {
+          document.getElementById('authModal').style.display = 'none';
+          document.getElementById('adminApp').style.display = 'block';
+        } else {
+          document.getElementById('authModal').style.display = 'flex';
+          document.getElementById('adminApp').style.display = 'none';
+        }
+      } catch (e) {
+        document.getElementById('authModal').style.display = 'flex';
+        document.getElementById('adminApp').style.display = 'none';
+      }
+    });
+
+    window.showPanel = function(panelName) {
+      var panelId = 'panel-' + panelName;
+      var tabs = document.getElementsByClassName('admin-tab');
+      var panels = document.getElementsByClassName('admin-panel');
+      var i, j;
+      for (i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove('active');
+        if (tabs[i].getAttribute('data-panel') === panelName) {
+          tabs[i].classList.add('active');
+        }
+      }
+      for (j = 0; j < panels.length; j++) {
+        panels[j].style.display = (panels[j].id === panelId) ? 'block' : 'none';
+        if (panels[j].id === panelId) {
+          panels[j].classList.add('active');
+        } else {
+          panels[j].classList.remove('active');
+        }
+      }
+    };
+    document.addEventListener('DOMContentLoaded', function() {
+      window.showPanel('upload');
+    });
+  </script>
+  <script src="admin.js"></script>
+</body>
+</html>

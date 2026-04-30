@@ -1,0 +1,102 @@
+{
+  "PBS00BE": {
+    "name": "Lecturer (PBS00BE)",
+    "title": "PBS00BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "MET00BE": {
+    "name": "Lecturer (MET00BE)",
+    "title": "MET00BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CET00BE": {
+    "name": "Lecturer (CET00BE)",
+    "title": "CET00BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "FCL00BE": {
+    "name": "Lecturer (FCL00BE)",
+    "title": "FCL00BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CMT00BE": {
+    "name": "Lecturer (CMT00BE)",
+    "title": "CMT00BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "FHD00BE": {
+    "name": "Lecturer (FHD00BE)",
+    "title": "FHD00BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "LCS5001": {
+    "name": "Lecturer (LCS5001)",
+    "title": "LCS5001",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "COM00BE": {
+    "name": "Lecturer (COM00BE)",
+    "title": "COM00BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CTG00BE": {
+    "name": "Lecturer (CTG00BE)",
+    "title": "CTG00BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "SES00BE": {
+    "name": "Lecturer (SES00BE)",
+    "title": "SES00BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "ALC5011": {
+    "name": "Lecturer (ALC5011)",
+    "title": "ALC5011",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "BDL11A": {
+    "name": "Lecturer (BDL11A)",
+    "title": "BDL11A",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CAM11A": {
+    "name": "Lecturer (CAM11A)",
+    "title": "CAM11A",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CCM11A": {
+    "name": "Lecturer (CCM11A)",
+    "title": "CCM11A",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CDR21A": {
+    "name": "Lecturer (CDR21A)",
+    "title": "CDR21A",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CDS21A": {
+    "name": "Lecturer (CDS21A)",
+    "title": "CDS21A",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CHY21A": {
+    "name": "Lecturer (CHY21A)",
+    "title": "CHY21A",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CSU21A": {
+    "name": "Lecturer (CSU21A)",
+    "title": "CSU21A",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CTE21A": {
+    "name": "Lecturer (CTE21A)",
+    "title": "CTE21A",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "MAT11A": {
+    "name": "Lecturer (MAT11A)",
+    "title": "MAT11A",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "PIM5011": {
+    "name": "Lecturer (PIM5011)",
+    "title": "PIM5011",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  }
+}

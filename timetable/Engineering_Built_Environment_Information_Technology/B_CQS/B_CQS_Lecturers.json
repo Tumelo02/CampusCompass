@@ -1,0 +1,232 @@
+{
+  "BGD20BE": {
+    "name": "Lecturer (BGD20BE)",
+    "title": "BGD20BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CAP30BE": {
+    "name": "Lecturer (CAP30BE)",
+    "title": "CAP30BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CDL20BE": {
+    "name": "Lecturer (CDL20BE)",
+    "title": "CDL20BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CML10BE": {
+    "name": "Lecturer (CML10BE)",
+    "title": "CML10BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CNM20BE": {
+    "name": "Lecturer (CNM20BE)",
+    "title": "CNM20BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CNT10BE": {
+    "name": "Lecturer (CNT10BE)",
+    "title": "CNT10BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "COM10BE": {
+    "name": "Lecturer (COM10BE)",
+    "title": "COM10BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CSG30BE": {
+    "name": "Lecturer (CSG30BE)",
+    "title": "CSG30BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "CTA20BE": {
+    "name": "Lecturer (CTA20BE)",
+    "title": "CTA20BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "DCT10BE": {
+    "name": "Lecturer (DCT10BE)",
+    "title": "DCT10BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "IWE30BE": {
+    "name": "Lecturer (IWE30BE)",
+    "title": "IWE30BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "MSC30BE": {
+    "name": "Lecturer (MSC30BE)",
+    "title": "MSC30BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "PGA20BE": {
+    "name": "Lecturer (PGA20BE)",
+    "title": "PGA20BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "PIM5011": {
+    "name": "Lecturer (PIM5011)",
+    "title": "PIM5011",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "PSE30BE": {
+    "name": "Lecturer (PSE30BE)",
+    "title": "PSE30BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "PTG20BE": {
+    "name": "Lecturer (PTG20BE)",
+    "title": "PTG20BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "QSP30BE": {
+    "name": "Lecturer (QSP30BE)",
+    "title": "QSP30BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "QTS10BE": {
+    "name": "Lecturer (QTS10BE)",
+    "title": "QTS10BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "QTS20BE": {
+    "name": "Lecturer (QTS20BE)",
+    "title": "QTS20BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "QTS30BE": {
+    "name": "Lecturer (QTS30BE)",
+    "title": "QTS30BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "RCM10BE": {
+    "name": "Lecturer (RCM10BE)",
+    "title": "RCM10BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "UBE20BE": {
+    "name": "Lecturer (UBE20BE)",
+    "title": "UBE20BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "UDS10BE": {
+    "name": "Lecturer (UDS10BE)",
+    "title": "UDS10BE",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  }
+}

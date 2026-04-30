@@ -1,0 +1,72 @@
+{
+  "PPE5011": {
+    "name": "Lecturer (PPE5011)",
+    "title": "PPE5011",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "EEN5011": {
+    "name": "Lecturer (EEN5011)",
+    "title": "EEN5011",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "LES5011": {
+    "name": "Lecturer (LES5011)",
+    "title": "LES5011",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "DLC5011": {
+    "name": "Lecturer (DLC5011)",
+    "title": "DLC5011",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "LCS5001": {
+    "name": "Lecturer (LCS5001)",
+    "title": "LCS5001",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "WIS5011": {
+    "name": "Lecturer (WIS5011)",
+    "title": "WIS5011",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  },
+  "PIM5011": {
+    "name": "Lecturer (PIM5011)",
+    "title": "PIM5011",
+    "office": "TBA",
+    "officeFloor": 0,
+    "classBuilding": "TBA",
+    "consultation": "TBA",
+    "email": "",
+    "photo": ""
+  }
+}

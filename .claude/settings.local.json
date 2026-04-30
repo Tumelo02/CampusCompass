@@ -1,0 +1,25 @@
+{
+  "env": {
+          "ANTHROPIC_AUTH_TOKEN":"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",
+          "ANTHROPIC_BASE_URL":"https://openrouter.ai/api",
+          "ANTHROPIC_DEFAULT_MODEL":"minimax/minimax-m2.5:free"
+          
+  },
+  
+  "permissions": {
+    "allow": [
+      "Bash(find \"c:/Users/mango/OneDrive/Documents/Student-Timetable-main/timetable/Engineering_Built_Environment_Information_Technology/\" -name \"*.json\" -size +10c -exec ls -la {} \\\\;)",
+      "Bash(node -e ' *)",
+      "Bash(node --check \"c:/Users/mango/OneDrive/Documents/Student-Timetable-main/app.js\")",
+      "Bash(python build_bundle.py)",
+      "Bash(python check_zero_entries.py)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code} in %{time_total}s\\\\n\" --max-time 15 \"https://timetable.cut.ac.za/BLOEM_CALENDAR/cal?vt=listWeek&dt=2026-02-20&et=group\")",
+      "Bash(python -c ' *)",
+      "Bash(nslookup timetable.cut.ac.za)",
+      "Bash(ping -n 2 timetable.cut.ac.za)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code} in %{time_total}s\\\\n\" --max-time 10 \"https://timetable.cut.ac.za/BLOEM_CALENDAR/cal\")",
+      "Bash(find . -name \"*.js\" -type f -delete)",
+      "Bash(python -c \"import json; from pathlib import Path; base = Path\\('Engineering_Built_Environment_Information_Technology/B_ETE'\\); [print\\(p.name, len\\(json.loads\\(p.read_text\\(encoding='utf-8'\\)\\)\\)\\) for p in sorted\\(base.glob\\('B_ETE_Year*.json'\\)\\)]\")"
+    ]
+  }
+}

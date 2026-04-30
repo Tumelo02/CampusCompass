@@ -1,0 +1,33 @@
+CUT TIMETABLE VERIFICATION REPORT
+================================================================================
+
+Total programs: 13
+Programs with data: 10
+Total entries: 474
+
+Programs with 0 entries:
+  - B_INF
+  - DP_IT
+  - ITEC
+
+Year 2/3 with 0 entries:
+  - B_CON Year 02
+  - B_CON Year 03
+  - B_CQS Year 02
+  - B_CQS Year 03
+  - B_CVLE Year 02
+  - B_CVLE Year 03
+  - B_ETE Year 02
+  - B_ETE Year 03
+  - B_INF Year 02
+  - B_INF Year 03
+  - B_MEC Year 02
+  - B_MEC Year 03
+  - DP_CVL Year 02
+  - DP_CVL Year 03
+  - DP_ELE Year 02
+  - DP_ELE Year 03
+  - DP_IT Year 02
+  - DP_IT Year 03
+  - DP_MEC Year 02
+  - DP_MEC Year 03
