@@ -880,8 +880,8 @@
     } catch (_) {}
 
     var defaults = [
-      'Look for this building (' + building + ').',
-      'Look for this building (' + building + ').',
+      'Look for this building.',
+      'Look for this building.',
       'Go to the ' + floorLabelText + '.',
       'Look for this door (' + doorLabel + ').',
       'The venue should look like this.'
