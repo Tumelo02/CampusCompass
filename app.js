@@ -913,7 +913,7 @@
   }
 
   document.getElementById('btnGoToClass').addEventListener('click', function () { openDirections('class'); });
-  document.getElementById('btnGoToOffice').addEventListener('click', function () { openDirections('office'); });
+  document.getElementById('btnGoToOffice').addEventListener('click', function () { alert('Coming soon'); });
   if (directionsBackdrop) directionsBackdrop.addEventListener('click', closeDirections);
   if (directionsClose) directionsClose.addEventListener('click', closeDirections);
   directionsOverlay.addEventListener('keydown', function (e) {
