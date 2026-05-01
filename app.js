@@ -212,6 +212,10 @@
 
   function bundleToAppData(bundle) {
     var overrides = getAdminOverrides();
+    var bundleDisabled = {};
+    (Array.isArray(bundle.disabledCodes) ? bundle.disabledCodes : []).forEach(function (c) {
+      bundleDisabled[c] = true;
+    });
     var courses = [];
     var lecturers = {};
     (bundle.programs || []).forEach(function (prog) {
@@ -221,12 +225,14 @@
         var yearNum = parseInt(y.year, 10) || y.year;
         var code = prog.code + '_' + y.year;
         var ov = overrides[code];
+        var enabled = !bundleDisabled[code];
+        if (ov && typeof ov.enabled === 'boolean') enabled = ov.enabled;
         courses.push({
           code: code,
           name: prog.name + ' · Year ' + yearNum,
           program: prog.code,
           year: y.year,
-          enabled: ov ? (ov.enabled !== false) : true,
+          enabled: enabled,
           timetable: transformTimetable(raw)
         });
       });

@@ -298,6 +298,9 @@
   var slotsList = document.getElementById('slotsList');
   var slotAdd = document.getElementById('slotAdd');
   var courseAdd = document.getElementById('courseAdd');
+  var coursePublish = document.getElementById('coursePublish');
+  var publishBanner = document.getElementById('publishBanner');
+  var publishBannerDetail = document.getElementById('publishBannerDetail');
   var courseDelete = document.getElementById('courseDelete');
   var courseUploadZoneEl = document.getElementById('courseUploadZone');
   var courseJsonInputEl = document.getElementById('courseJsonInput');
@@ -398,6 +401,7 @@
         var nowEnabled = course.enabled !== false;
         btn.className = 'course-visibility-btn ' + (nowEnabled ? 'is-enabled' : 'is-disabled');
         btn.textContent = nowEnabled ? 'Visible' : 'Hidden';
+        refreshPublishBanner();
       });
     });
 
@@ -413,7 +417,89 @@
     });
   }
 
-  function refreshCoursesPanel() { refreshCourseCards(); }
+  function refreshCoursesPanel() { refreshCourseCards(); refreshPublishBanner(); }
+
+  var deployedBundle = null;
+  var deployedDisabledSet = null;
+
+  function fetchDeployedBundle() {
+    return fetch('timetable/bundle.json', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (b) {
+        deployedBundle = b;
+        deployedDisabledSet = {};
+        (Array.isArray(b.disabledCodes) ? b.disabledCodes : []).forEach(function (c) {
+          deployedDisabledSet[c] = true;
+        });
+        return b;
+      });
+  }
+
+  function getLocalDisabledCodes() {
+    var d = getStoredData();
+    var out = [];
+    (d.courses || []).forEach(function (c) {
+      if (c && c.code && c.enabled === false) out.push(c.code);
+    });
+    out.sort();
+    return out;
+  }
+
+  function diffDeployedVsLocal() {
+    var local = getLocalDisabledCodes();
+    if (!deployedDisabledSet) return { added: local, removed: [], total: local.length };
+    var localSet = {};
+    local.forEach(function (c) { localSet[c] = true; });
+    var added = local.filter(function (c) { return !deployedDisabledSet[c]; });
+    var removed = Object.keys(deployedDisabledSet).filter(function (c) { return !localSet[c]; });
+    return { added: added, removed: removed, total: added.length + removed.length };
+  }
+
+  function refreshPublishBanner() {
+    if (!publishBanner || !publishBannerDetail) return;
+    if (!deployedBundle) {
+      publishBanner.style.display = 'none';
+      return;
+    }
+    var diff = diffDeployedVsLocal();
+    if (diff.total === 0) {
+      publishBanner.style.display = 'none';
+      return;
+    }
+    var bits = [];
+    if (diff.added.length) bits.push(diff.added.length + ' newly hidden (' + diff.added.join(', ') + ')');
+    if (diff.removed.length) bits.push(diff.removed.length + ' newly visible (' + diff.removed.join(', ') + ')');
+    publishBannerDetail.innerHTML = bits.join(' · ') + ' — click <em>Publish visibility</em> to download an updated <code>bundle.json</code>, then commit it and push so mobile/other devices reflect the change.';
+    publishBanner.style.display = 'flex';
+  }
+
+  function publishVisibility() {
+    if (!deployedBundle) {
+      alert('Could not load deployed bundle.json. Make sure you are running the admin from the deployed site (or have it served locally) and try again.');
+      return;
+    }
+    var bundle = JSON.parse(JSON.stringify(deployedBundle));
+    bundle.disabledCodes = getLocalDisabledCodes();
+    var blob = new Blob([JSON.stringify(bundle)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'bundle.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    alert(
+      'Downloaded bundle.json with ' + bundle.disabledCodes.length + ' hidden course' +
+      (bundle.disabledCodes.length === 1 ? '' : 's') + '.\n\n' +
+      'Next steps:\n' +
+      '1. Replace timetable/bundle.json in your repo with this file\n' +
+      '2. git add timetable/bundle.json && git commit -m "Update course visibility"\n' +
+      '3. git push\n' +
+      'Vercel will rebuild and the change will appear on all devices.'
+    );
+  }
+
+  if (coursePublish) coursePublish.addEventListener('click', publishVisibility);
 
   function openCourseEditor(code) {
     var data = getStoredData();
@@ -974,6 +1060,7 @@
 
   initAdminFromBundle();
   refreshCoursesPanel();
+  fetchDeployedBundle().then(refreshPublishBanner).catch(function () {});
   loadVenuePreviews();
   loadVenueInstructions();
 })();

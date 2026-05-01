@@ -132,6 +132,13 @@
         <p class="admin-panel-desc">Manage course timetables. Toggle visibility for students, upload timetable JSON per course, and edit slots.</p>
         <div class="courses-toolbar">
           <button type="button" class="btn btn-secondary" id="courseAdd">+ Add course</button>
+          <button type="button" class="btn btn-primary" id="coursePublish" title="Generate an updated bundle.json with the current visibility settings so other devices see the change">Publish visibility</button>
+        </div>
+        <div class="publish-banner" id="publishBanner" style="display: none;" role="status">
+          <div class="publish-banner-text">
+            <strong>Unpublished changes</strong>
+            <span id="publishBannerDetail">Click <em>Publish visibility</em> to download an updated <code>bundle.json</code>, then commit it and push so mobile/other devices reflect the change.</span>
+          </div>
         </div>
         <div class="courses-list" id="coursesList"></div>
         <p class="admin-hint" id="coursesHint">No courses yet. Add a course or import from the <strong>Upload data</strong> tab.</p>
