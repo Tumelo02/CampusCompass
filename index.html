@@ -87,7 +87,7 @@
           <p class="course-list-empty" id="courseListEmpty" style="display: none;">No courses match your search.</p>
         </div>
         <div class="course-empty-state" id="courseEmptyState" style="display: none;">
-          <p>No courses yet. Add data in the <a href="admin.html">admin dashboard</a>.</p>
+          <p>No courses yet. Please check back later.</p>
         </div>
       </section>
 
@@ -209,5 +209,14 @@
   <script type="module" src="analytics.js"></script>
   <script type="module" src="speed-insights.js"></script>
   <script src="app.js"></script>
+  <script>
+    // Hidden admin shortcut: Ctrl+Shift+A
+    document.addEventListener('keydown', function (e) {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        window.location.href = 'admin.html';
+      }
+    });
+  </script>
 </body>
 </html>

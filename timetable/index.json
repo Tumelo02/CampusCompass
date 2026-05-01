@@ -1,144 +1,144 @@
 {
   "facultyName": "Engineering, Built Environment & Information Technology",
-  "facultyFolder": "Engineering_Built_Environment_Information_Technology",
+  "facultyFolder": "courses",
   "programs": [
     {
       "code": "B_ETE",
       "name": "Bachelor of Engineering Technology: Electrical Engineering",
-      "folder": "Engineering_Built_Environment_Information_Technology/B_ETE",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/B_ETE/B_ETE_Lecturers.json",
+      "folder": "courses/B_ETE",
+      "lecturers": "courses/B_ETE/B_ETE_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/B_ETE/B_ETE_Year01.json" },
-        { "year": "02", "timetable": "Engineering_Built_Environment_Information_Technology/B_ETE/B_ETE_Year02.json" },
-        { "year": "03", "timetable": "Engineering_Built_Environment_Information_Technology/B_ETE/B_ETE_Year03.json" }
+        { "year": "01", "timetable": "courses/B_ETE/B_ETE_Year01.json" },
+        { "year": "02", "timetable": "courses/B_ETE/B_ETE_Year02.json" },
+        { "year": "03", "timetable": "courses/B_ETE/B_ETE_Year03.json" }
       ]
     },
     {
       "code": "HC_CON",
       "name": "Higher Certificate: Construction",
-      "folder": "Engineering_Built_Environment_Information_Technology/HC_CON",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/HC_CON/HC_CON_Lecturers.json",
+      "folder": "courses/HC_CON",
+      "lecturers": "courses/HC_CON/HC_CON_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/HC_CON/HC_CON_Year01.json" }
+        { "year": "01", "timetable": "courses/HC_CON/HC_CON_Year01.json" }
       ]
     },
     {
       "code": "IEHCRE",
       "name": "Higher Certificate: Renewable Energy Technologies",
-      "folder": "Engineering_Built_Environment_Information_Technology/IEHCRE",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/IEHCRE/IEHCRE_Lecturers.json",
+      "folder": "courses/IEHCRE",
+      "lecturers": "courses/IEHCRE/IEHCRE_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/IEHCRE/IEHCRE_Year01.json" }
+        { "year": "01", "timetable": "courses/IEHCRE/IEHCRE_Year01.json" }
       ]
     },
     {
       "code": "B_CON",
       "name": "Bachelor of Engineering Technology: Construction",
-      "folder": "Engineering_Built_Environment_Information_Technology/B_CON",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/B_CON/B_CON_Lecturers.json",
+      "folder": "courses/B_CON",
+      "lecturers": "courses/B_CON/B_CON_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/B_CON/B_CON_Year01.json" },
-        { "year": "02", "timetable": "Engineering_Built_Environment_Information_Technology/B_CON/B_CON_Year02.json" },
-        { "year": "03", "timetable": "Engineering_Built_Environment_Information_Technology/B_CON/B_CON_Year03.json" }
+        { "year": "01", "timetable": "courses/B_CON/B_CON_Year01.json" },
+        { "year": "02", "timetable": "courses/B_CON/B_CON_Year02.json" },
+        { "year": "03", "timetable": "courses/B_CON/B_CON_Year03.json" }
       ]
     },
     {
       "code": "B_CQS",
       "name": "Bachelor of Construction: Quantity Surveying",
-      "folder": "Engineering_Built_Environment_Information_Technology/B_CQS",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/B_CQS/B_CQS_Lecturers.json",
+      "folder": "courses/B_CQS",
+      "lecturers": "courses/B_CQS/B_CQS_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/B_CQS/B_CQS_Year01.json" },
-        { "year": "02", "timetable": "Engineering_Built_Environment_Information_Technology/B_CQS/B_CQS_Year02.json" },
-        { "year": "03", "timetable": "Engineering_Built_Environment_Information_Technology/B_CQS/B_CQS_Year03.json" }
+        { "year": "01", "timetable": "courses/B_CQS/B_CQS_Year01.json" },
+        { "year": "02", "timetable": "courses/B_CQS/B_CQS_Year02.json" },
+        { "year": "03", "timetable": "courses/B_CQS/B_CQS_Year03.json" }
       ]
     },
     {
       "code": "B_CVLE",
       "name": "Bachelor of Engineering Technology: Civil Engineering",
-      "folder": "Engineering_Built_Environment_Information_Technology/B_CVLE",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/B_CVLE/B_CVLE_Lecturers.json",
+      "folder": "courses/B_CVLE",
+      "lecturers": "courses/B_CVLE/B_CVLE_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/B_CVLE/B_CVLE_Year01.json" },
-        { "year": "02", "timetable": "Engineering_Built_Environment_Information_Technology/B_CVLE/B_CVLE_Year02.json" },
-        { "year": "03", "timetable": "Engineering_Built_Environment_Information_Technology/B_CVLE/B_CVLE_Year03.json" }
+        { "year": "01", "timetable": "courses/B_CVLE/B_CVLE_Year01.json" },
+        { "year": "02", "timetable": "courses/B_CVLE/B_CVLE_Year02.json" },
+        { "year": "03", "timetable": "courses/B_CVLE/B_CVLE_Year03.json" }
       ]
     },
     {
       "code": "B_INF",
       "name": "Bachelor of Information Technology",
-      "folder": "Engineering_Built_Environment_Information_Technology/B_INF",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/B_INF/B_INF_Lecturers.json",
+      "folder": "courses/B_INF",
+      "lecturers": "courses/B_INF/B_INF_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/B_INF/B_INF_Year01.json" },
-        { "year": "02", "timetable": "Engineering_Built_Environment_Information_Technology/B_INF/B_INF_Year02.json" },
-        { "year": "03", "timetable": "Engineering_Built_Environment_Information_Technology/B_INF/B_INF_Year03.json" }
+        { "year": "01", "timetable": "courses/B_INF/B_INF_Year01.json" },
+        { "year": "02", "timetable": "courses/B_INF/B_INF_Year02.json" },
+        { "year": "03", "timetable": "courses/B_INF/B_INF_Year03.json" }
       ]
     },
     {
       "code": "B_MEC",
       "name": "Bachelor of Engineering Technology: Mechanical Engineering",
-      "folder": "Engineering_Built_Environment_Information_Technology/B_MEC",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/B_MEC/B_MEC_Lecturers.json",
+      "folder": "courses/B_MEC",
+      "lecturers": "courses/B_MEC/B_MEC_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/B_MEC/B_MEC_Year01.json" },
-        { "year": "02", "timetable": "Engineering_Built_Environment_Information_Technology/B_MEC/B_MEC_Year02.json" },
-        { "year": "03", "timetable": "Engineering_Built_Environment_Information_Technology/B_MEC/B_MEC_Year03.json" }
+        { "year": "01", "timetable": "courses/B_MEC/B_MEC_Year01.json" },
+        { "year": "02", "timetable": "courses/B_MEC/B_MEC_Year02.json" },
+        { "year": "03", "timetable": "courses/B_MEC/B_MEC_Year03.json" }
       ]
     },
     {
       "code": "DP_CVL",
       "name": "Diploma in Civil Engineering",
-      "folder": "Engineering_Built_Environment_Information_Technology/DP_CVL",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/DP_CVL/DP_CVL_Lecturers.json",
+      "folder": "courses/DP_CVL",
+      "lecturers": "courses/DP_CVL/DP_CVL_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/DP_CVL/DP_CVL_Year01.json" },
-        { "year": "02", "timetable": "Engineering_Built_Environment_Information_Technology/DP_CVL/DP_CVL_Year02.json" },
-        { "year": "03", "timetable": "Engineering_Built_Environment_Information_Technology/DP_CVL/DP_CVL_Year03.json" }
+        { "year": "01", "timetable": "courses/DP_CVL/DP_CVL_Year01.json" },
+        { "year": "02", "timetable": "courses/DP_CVL/DP_CVL_Year02.json" },
+        { "year": "03", "timetable": "courses/DP_CVL/DP_CVL_Year03.json" }
       ]
     },
     {
       "code": "DP_ELE",
       "name": "Diploma in Electrical Engineering",
-      "folder": "Engineering_Built_Environment_Information_Technology/DP_ELE",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/DP_ELE/DP_ELE_Lecturers.json",
+      "folder": "courses/DP_ELE",
+      "lecturers": "courses/DP_ELE/DP_ELE_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/DP_ELE/DP_ELE_Year01.json" },
-        { "year": "02", "timetable": "Engineering_Built_Environment_Information_Technology/DP_ELE/DP_ELE_Year02.json" },
-        { "year": "03", "timetable": "Engineering_Built_Environment_Information_Technology/DP_ELE/DP_ELE_Year03.json" }
+        { "year": "01", "timetable": "courses/DP_ELE/DP_ELE_Year01.json" },
+        { "year": "02", "timetable": "courses/DP_ELE/DP_ELE_Year02.json" },
+        { "year": "03", "timetable": "courses/DP_ELE/DP_ELE_Year03.json" }
       ]
     },
     {
       "code": "DP_IT",
       "name": "Diploma in Information Technology",
-      "folder": "Engineering_Built_Environment_Information_Technology/DP_IT",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/DP_IT/DP_IT_Lecturers.json",
+      "folder": "courses/DP_IT",
+      "lecturers": "courses/DP_IT/DP_IT_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/DP_IT/DP_IT_Year01.json" },
-        { "year": "02", "timetable": "Engineering_Built_Environment_Information_Technology/DP_IT/DP_IT_Year02.json" },
-        { "year": "03", "timetable": "Engineering_Built_Environment_Information_Technology/DP_IT/DP_IT_Year03.json" }
+        { "year": "01", "timetable": "courses/DP_IT/DP_IT_Year01.json" },
+        { "year": "02", "timetable": "courses/DP_IT/DP_IT_Year02.json" },
+        { "year": "03", "timetable": "courses/DP_IT/DP_IT_Year03.json" }
       ]
     },
     {
       "code": "DP_MEC",
       "name": "Diploma in Mechanical Engineering",
-      "folder": "Engineering_Built_Environment_Information_Technology/DP_MEC",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/DP_MEC/DP_MEC_Lecturers.json",
+      "folder": "courses/DP_MEC",
+      "lecturers": "courses/DP_MEC/DP_MEC_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/DP_MEC/DP_MEC_Year01.json" },
-        { "year": "02", "timetable": "Engineering_Built_Environment_Information_Technology/DP_MEC/DP_MEC_Year02.json" },
-        { "year": "03", "timetable": "Engineering_Built_Environment_Information_Technology/DP_MEC/DP_MEC_Year03.json" }
+        { "year": "01", "timetable": "courses/DP_MEC/DP_MEC_Year01.json" },
+        { "year": "02", "timetable": "courses/DP_MEC/DP_MEC_Year02.json" },
+        { "year": "03", "timetable": "courses/DP_MEC/DP_MEC_Year03.json" }
       ]
     },
     {
       "code": "ITEC",
       "name": "Information Technology",
-      "folder": "Engineering_Built_Environment_Information_Technology/ITEC",
-      "lecturers": "Engineering_Built_Environment_Information_Technology/ITEC/ITEC_Lecturers.json",
+      "folder": "courses/ITEC",
+      "lecturers": "courses/ITEC/ITEC_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "Engineering_Built_Environment_Information_Technology/ITEC/ITEC_Year01.json" },
-        { "year": "02", "timetable": "Engineering_Built_Environment_Information_Technology/ITEC/ITEC_Year02.json" },
-        { "year": "03", "timetable": "Engineering_Built_Environment_Information_Technology/ITEC/ITEC_Year03.json" }
+        { "year": "01", "timetable": "courses/ITEC/ITEC_Year01.json" },
+        { "year": "02", "timetable": "courses/ITEC/ITEC_Year02.json" },
+        { "year": "03", "timetable": "courses/ITEC/ITEC_Year03.json" }
       ]
     }
   ]

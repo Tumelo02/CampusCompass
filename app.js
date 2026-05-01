@@ -195,7 +195,23 @@
     return slots;
   }
 
+  function getAdminOverrides() {
+    try {
+      var raw = localStorage.getItem('timetable_admin_data');
+      if (!raw) return {};
+      var data = JSON.parse(raw);
+      var map = {};
+      (data.courses || []).forEach(function (c) {
+        if (c && c.code) map[c.code] = c;
+      });
+      return map;
+    } catch (e) {
+      return {};
+    }
+  }
+
   function bundleToAppData(bundle) {
+    var overrides = getAdminOverrides();
     var courses = [];
     var lecturers = {};
     (bundle.programs || []).forEach(function (prog) {
@@ -203,14 +219,30 @@
       (prog.years || []).forEach(function (y) {
         var raw = Array.isArray(y.timetable) ? y.timetable : [];
         var yearNum = parseInt(y.year, 10) || y.year;
+        var code = prog.code + '_' + y.year;
+        var ov = overrides[code];
         courses.push({
-          code: prog.code + '_' + y.year,
+          code: code,
           name: prog.name + ' · Year ' + yearNum,
           program: prog.code,
           year: y.year,
+          enabled: ov ? (ov.enabled !== false) : true,
           timetable: transformTimetable(raw)
         });
       });
+    });
+    Object.keys(overrides).forEach(function (code) {
+      if (!courses.some(function (c) { return c.code === code; })) {
+        var ov = overrides[code];
+        courses.push({
+          code: code,
+          name: ov.name || code,
+          program: ov.folder || '',
+          year: '',
+          enabled: ov.enabled !== false,
+          timetable: transformTimetable(ov.timetable || [])
+        });
+      }
     });
     courses.sort(function (a, b) { return a.code.localeCompare(b.code); });
     return { courses: courses, lecturers: lecturers };

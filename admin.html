@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard · Timetable</title>
+  <title>Timetable</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
@@ -25,23 +25,27 @@
   <!-- Authentication Modal -->
   <div class="auth-modal" id="authModal" aria-labelledby="authTitle" role="dialog" aria-modal="true">
     <div class="auth-modal-content">
+      <div class="auth-warning-banner" role="alert">
+        <strong>RESTRICTED — AUTHORIZED PERSONNEL ONLY</strong>
+        <span>Private system. All sign-in attempts are logged and monitored. Unauthorized access is a criminal offence under the Cybercrimes Act and will be prosecuted. If you are not authorized, leave now.</span>
+      </div>
       <div class="auth-modal-header">
-        <h1 id="authTitle" class="auth-modal-title">Admin Dashboard</h1>
-        <p class="auth-modal-subtitle">Enter password to continue</p>
+        <h1 id="authTitle" class="auth-modal-title">Sign in</h1>
+        <p class="auth-modal-subtitle">Enter passcode to continue</p>
       </div>
       <form class="auth-form" id="authForm" onsubmit="return window.handleAdminAuth(event)">
-        <label for="adminPassword" class="auth-label">Password</label>
-        <input 
-          type="password" 
-          id="adminPassword" 
-          class="auth-input" 
-          placeholder="Enter admin password" 
-          required 
+        <label for="adminPassword" class="auth-label">Passcode</label>
+        <input
+          type="password"
+          id="adminPassword"
+          class="auth-input"
+          placeholder="Enter passcode"
+          required
           autocomplete="current-password"
-          aria-label="Admin password"
+          aria-label="Passcode"
         />
         <div id="authError" class="auth-error" role="alert" aria-live="polite"></div>
-        <button type="submit" class="auth-button">Access Admin Panel</button>
+        <button type="submit" class="auth-button">Continue</button>
       </form>
       <p class="auth-hint">
         <a href="index.html" class="auth-back-link">← Back to Timetable</a>
@@ -125,38 +129,45 @@
       <!-- Panel: Courses & timetables -->
       <section class="admin-panel" id="panel-courses" aria-labelledby="heading-courses">
         <h2 id="heading-courses" class="admin-panel-title">Courses & timetables</h2>
-        <p class="admin-panel-desc">Create or edit course timetables. Select a course to modify its slots and lecturer links.</p>
+        <p class="admin-panel-desc">Manage course timetables. Toggle visibility for students, upload timetable JSON per course, and edit slots.</p>
         <div class="courses-toolbar">
-          <select id="courseSelect" class="course-select">
-            <option value="">Select a course…</option>
-          </select>
-          <button type="button" class="btn btn-secondary" id="courseAdd">Add course</button>
-          <button type="button" class="btn btn-ghost btn-small" id="courseDelete" style="display:none;">Delete course</button>
+          <button type="button" class="btn btn-secondary" id="courseAdd">+ Add course</button>
         </div>
+        <div class="courses-list" id="coursesList"></div>
+        <p class="admin-hint" id="coursesHint">No courses yet. Add a course or import from the <strong>Upload data</strong> tab.</p>
         <div class="course-editor" id="courseEditor" style="display: none;">
+          <div class="course-editor-heading">
+            <h3 class="course-editor-label">Editing: <span id="courseEditorCode"></span></h3>
+            <button type="button" class="btn btn-ghost btn-small" id="courseEditorClose">Close ×</button>
+          </div>
           <div class="course-editor-meta">
-            <label>Folder/Category (e.g. Engineering, Medicine) <input type="text" id="editFolder" placeholder="e.g. Engineering_Built_Environment" /></label>
+            <label>Folder/Category <input type="text" id="editFolder" placeholder="e.g. Engineering_Built_Environment" /></label>
             <label>Course code <input type="text" id="editCode" placeholder="e.g. IENDCY336" /></label>
             <label>Display name <input type="text" id="editName" placeholder="e.g. Industrial Engineering · Year 3" /></label>
-            <label style="display: flex; align-items: center; gap: 0.5rem;">
-              <input type="checkbox" id="editEnabled" />
-              <span>Enabled (show to users)</span>
-            </label>
           </div>
-          <h3>Upload JSON timetable</h3>
-          <p class="admin-hint">Upload a JSON file with timetable data for this course.</p>
-          <div class="upload-zone-small" id="courseUploadZone">
+          <h3>Upload timetable JSON</h3>
+          <p class="admin-hint">Drop a JSON file to load timetable slots for this course. Supports full exports or <code>{"timetable":[...]}</code> format.</p>
+          <div class="upload-zone upload-zone-compact" id="courseUploadZone">
             <input type="file" id="courseJsonInput" accept=".json,application/json" hidden />
-            <button type="button" class="btn btn-secondary btn-small" id="courseUploadBrowse">Upload timetable JSON</button>
+            <p class="upload-zone-text">Drop JSON here or <button type="button" class="upload-browse" id="courseUploadBrowse">browse</button></p>
+          </div>
+          <div class="upload-preview" id="courseUploadPreview" style="display: none;">
+            <h4 class="upload-preview-title">Preview</h4>
+            <pre class="upload-preview-json" id="courseUploadPreviewJson"></pre>
+            <p class="upload-preview-summary" id="courseUploadPreviewSummary"></p>
+            <div class="upload-actions">
+              <button type="button" class="btn btn-primary" id="courseUploadConfirm">Import into course</button>
+              <button type="button" class="btn btn-ghost" id="courseUploadCancel">Cancel</button>
+            </div>
           </div>
           <h3>Timetable slots</h3>
           <div class="slots-toolbar">
             <button type="button" class="btn btn-small" id="slotAdd">+ Add slot</button>
             <button type="button" class="btn btn-primary btn-small" id="courseSave">Save course</button>
+            <button type="button" class="btn btn-ghost btn-small" id="courseDelete" style="display:none; color:#e74c3c;">Delete course</button>
           </div>
           <div class="slots-list" id="slotsList"></div>
         </div>
-        <p class="admin-hint" id="coursesHint">Import data from the Upload tab first, or add a new course.</p>
       </section>
 
       <!-- Panel: Lecturers -->
@@ -252,28 +263,56 @@
   <!-- End of admin-app -->
 
   <script>
-    // Authentication handler
+    // SHA-256 hash of the passcode. To change: open browser console on admin.html and run
+    //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('YourNewPassword'))
+    //     .then(b => console.log(Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join('')))
+    // then paste the resulting hex string below.
+    var ADMIN_PASS_HASH = 'd645cfd318c93a02d24fd2932d844c43bb0e251a65502a51370177b9177065bb';
+
+    function sha256Hex(str) {
+      var enc = new TextEncoder().encode(str);
+      return crypto.subtle.digest('SHA-256', enc).then(function (buf) {
+        return Array.from(new Uint8Array(buf)).map(function (x) {
+          return x.toString(16).padStart(2, '0');
+        }).join('');
+      });
+    }
+
+    function getFailedAttempts() {
+      try { return parseInt(localStorage.getItem('admin_failed_attempts') || '0', 10) || 0; }
+      catch (e) { return 0; }
+    }
+    function setFailedAttempts(n) {
+      try { localStorage.setItem('admin_failed_attempts', String(n)); } catch (e) {}
+    }
+
     window.handleAdminAuth = function(event) {
       event.preventDefault();
       var passwordInput = document.getElementById('adminPassword');
-      var adminPassword = 'admin'; // Default password - change this to your desired password
       var errorDiv = document.getElementById('authError');
-      
-      if (passwordInput.value === adminPassword) {
-        try {
-          sessionStorage.setItem('admin_authenticated', 'true');
-        } catch (e) {}
-        // Show admin panel
-        document.getElementById('authModal').style.display = 'none';
-        document.getElementById('adminApp').style.display = 'block';
-        passwordInput.value = '';
-        errorDiv.textContent = '';
-        return false;
-      } else {
-        errorDiv.textContent = 'Incorrect password. Please try again.';
-        passwordInput.value = '';
-        return false;
-      }
+      var attempt = passwordInput.value;
+
+      sha256Hex(attempt).then(function (hex) {
+        if (hex === ADMIN_PASS_HASH) {
+          try { sessionStorage.setItem('admin_authenticated', 'true'); } catch (e) {}
+          setFailedAttempts(0);
+          document.getElementById('authModal').style.display = 'none';
+          document.getElementById('adminApp').style.display = 'block';
+          passwordInput.value = '';
+          errorDiv.textContent = '';
+        } else {
+          var n = getFailedAttempts() + 1;
+          setFailedAttempts(n);
+          var ts = new Date().toISOString();
+          var msg = '⚠ ACCESS DENIED — Attempt #' + n + ' logged at ' + ts + '. Your session has been recorded and reported. Further attempts will be prosecuted under the Cybercrimes Act. Leave now.';
+          errorDiv.textContent = msg;
+          passwordInput.value = '';
+        }
+      }).catch(function () {
+        errorDiv.textContent = 'Authentication unavailable in this browser.';
+      });
+
+      return false;
     };
 
     // Initialize auth on page load

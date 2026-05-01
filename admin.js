@@ -287,28 +287,49 @@
   });
 
   // —— Courses panel ——
-  var courseSelect = document.getElementById('courseSelect');
+  var coursesList = document.getElementById('coursesList');
   var courseEditor = document.getElementById('courseEditor');
   var coursesHint = document.getElementById('coursesHint');
+  var courseEditorCodeEl = document.getElementById('courseEditorCode');
+  var courseEditorCloseBtn = document.getElementById('courseEditorClose');
   var editFolder = document.getElementById('editFolder');
   var editCode = document.getElementById('editCode');
   var editName = document.getElementById('editName');
-  var editEnabled = document.getElementById('editEnabled');
   var slotsList = document.getElementById('slotsList');
   var slotAdd = document.getElementById('slotAdd');
   var courseAdd = document.getElementById('courseAdd');
   var courseDelete = document.getElementById('courseDelete');
-  var courseJsonInput = document.getElementById('courseJsonInput');
-  var courseUploadBrowse = document.getElementById('courseUploadBrowse');
+  var courseUploadZoneEl = document.getElementById('courseUploadZone');
+  var courseJsonInputEl = document.getElementById('courseJsonInput');
+  var courseUploadBrowseBtn = document.getElementById('courseUploadBrowse');
+  var courseUploadPreviewEl = document.getElementById('courseUploadPreview');
+  var courseUploadPreviewJsonEl = document.getElementById('courseUploadPreviewJson');
+  var courseUploadPreviewSummaryEl = document.getElementById('courseUploadPreviewSummary');
+  var courseUploadConfirmBtn = document.getElementById('courseUploadConfirm');
+  var courseUploadCancelBtn = document.getElementById('courseUploadCancel');
   var currentCourseCode = null;
+  var pendingCourseUpload = null;
   var DAYS = ['mon', 'tue', 'wed', 'thu', 'fri'];
 
-  function refreshCoursesPanel() {
+  function refreshCourseCards() {
+    if (!coursesList) return;
+
+    // Move editor out of coursesList before clearing it
+    if (courseEditor && coursesList.contains(courseEditor)) {
+      var panel = document.getElementById('panel-courses');
+      if (panel) panel.appendChild(courseEditor);
+    }
+
     var data = getStoredData();
     var courses = data.courses || [];
-    courseSelect.innerHTML = '<option value="">Select a course…</option>';
-    
-    // Group courses by folder
+    coursesList.innerHTML = '';
+
+    if (courses.length === 0) {
+      if (coursesHint) coursesHint.style.display = '';
+      return;
+    }
+    if (coursesHint) coursesHint.style.display = 'none';
+
     var grouped = {};
     courses.forEach(function (c) {
       if (!c.code) return;
@@ -316,26 +337,114 @@
       if (!grouped[folder]) grouped[folder] = [];
       grouped[folder].push(c);
     });
-    
-    // Add optgroups for each folder
-    var folders = Object.keys(grouped).sort();
-    folders.forEach(function (folder) {
-      var optgroup = document.createElement('optgroup');
-      optgroup.label = folder;
+
+    Object.keys(grouped).sort().forEach(function (folder) {
+      var groupEl = document.createElement('div');
+      groupEl.className = 'course-folder-group';
+
+      var labelEl = document.createElement('div');
+      labelEl.className = 'course-folder-label';
+      labelEl.textContent = folder;
+      groupEl.appendChild(labelEl);
+
       grouped[folder].forEach(function (c) {
-        var opt = document.createElement('option');
-        opt.value = c.code;
-        opt.textContent = c.code + (c.name ? ' · ' + c.name : '');
-        optgroup.appendChild(opt);
+        var isActive = currentCourseCode === c.code;
+        var isEnabled = c.enabled !== false;
+        var slotCount = (c.timetable || []).filter(function (s) { return !s.break; }).length;
+
+        var card = document.createElement('div');
+        card.className = 'course-card' + (isActive ? ' is-active' : '');
+        card.dataset.code = c.code;
+        card.innerHTML =
+          '<div class="course-card-body">' +
+            '<div class="course-card-info">' +
+              '<span class="course-card-code">' + escapeHtml(c.code) + '</span>' +
+              '<span class="course-card-name">' + escapeHtml(c.name || '—') + '</span>' +
+            '</div>' +
+            '<div class="course-card-controls">' +
+              '<span class="course-slot-count">' + slotCount + ' slot' + (slotCount !== 1 ? 's' : '') + '</span>' +
+              '<button type="button" class="course-visibility-btn ' + (isEnabled ? 'is-enabled' : 'is-disabled') + '" data-code="' + escapeHtml(c.code) + '">' +
+                (isEnabled ? 'Visible' : 'Hidden') +
+              '</button>' +
+              '<button type="button" class="btn btn-small course-edit-btn" data-code="' + escapeHtml(c.code) + '">' +
+                (isActive ? 'Close' : 'Edit') +
+              '</button>' +
+            '</div>' +
+          '</div>';
+        groupEl.appendChild(card);
       });
-      courseSelect.appendChild(optgroup);
+
+      coursesList.appendChild(groupEl);
     });
-    
-    if (currentCourseCode && courseSelect.value !== currentCourseCode) {
-      currentCourseCode = null;
-      courseEditor.style.display = 'none';
-      coursesHint.style.display = 'block';
+
+    // Insert editor inline after active card (accordion)
+    if (currentCourseCode && courseEditor) {
+      var activeCard = coursesList.querySelector('[data-code="' + currentCourseCode + '"]');
+      if (activeCard) {
+        activeCard.after(courseEditor);
+        courseEditor.style.display = 'block';
+      }
     }
+
+    coursesList.querySelectorAll('.course-visibility-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var code = btn.dataset.code;
+        var d = getStoredData();
+        var course = (d.courses || []).find(function (c) { return c.code === code; });
+        if (!course) return;
+        course.enabled = (course.enabled === false) ? true : false;
+        setStoredData(d);
+        var nowEnabled = course.enabled !== false;
+        btn.className = 'course-visibility-btn ' + (nowEnabled ? 'is-enabled' : 'is-disabled');
+        btn.textContent = nowEnabled ? 'Visible' : 'Hidden';
+      });
+    });
+
+    coursesList.querySelectorAll('.course-edit-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var code = btn.dataset.code;
+        if (currentCourseCode === code) {
+          closeCourseEditor();
+        } else {
+          openCourseEditor(code);
+        }
+      });
+    });
+  }
+
+  function refreshCoursesPanel() { refreshCourseCards(); }
+
+  function openCourseEditor(code) {
+    var data = getStoredData();
+    var course = (data.courses || []).find(function (c) { return c.code === code; });
+    currentCourseCode = code;
+    if (courseEditorCodeEl) courseEditorCodeEl.textContent = code;
+    editFolder.value = course ? (course.folder || '') : '';
+    editCode.value = course ? course.code : code;
+    editName.value = course ? course.name : '';
+    if (courseDelete) courseDelete.style.display = '';
+    if (courseUploadPreviewEl) courseUploadPreviewEl.style.display = 'none';
+    pendingCourseUpload = null;
+    renderSlots(course ? course.timetable : []);
+    refreshCourseCards();
+    setTimeout(function () {
+      if (courseEditor) courseEditor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 60);
+  }
+
+  function closeCourseEditor() {
+    currentCourseCode = null;
+    if (courseEditor) {
+      courseEditor.style.display = 'none';
+      var panel = document.getElementById('panel-courses');
+      if (panel) panel.appendChild(courseEditor);
+    }
+    refreshCourseCards();
+  }
+
+  if (courseEditorCloseBtn) {
+    courseEditorCloseBtn.addEventListener('click', closeCourseEditor);
   }
 
   function renderSlots(timetable) {
@@ -408,117 +517,134 @@
     var folder = editFolder.value.trim();
     if (!code) return;
     var timetable = getSlotsFromForm();
-    var enabled = editEnabled.checked;
     var existing = (data.courses || []).find(function (c) { return c.code === currentCourseCode; });
     if (existing) {
       existing.code = code;
       existing.name = name;
       existing.folder = folder || 'Other';
-      existing.enabled = enabled;
       existing.timetable = timetable;
+      // enabled is toggled separately via the card visibility button
     } else {
-      data.courses.push({ code: code, name: name, folder: folder || 'Other', enabled: enabled, timetable: timetable });
+      (data.courses = data.courses || []).push({ code: code, name: name, folder: folder || 'Other', enabled: true, timetable: timetable });
     }
     if (code !== currentCourseCode) {
       data.courses = data.courses.filter(function (c) { return c.code !== currentCourseCode; });
       currentCourseCode = code;
+      if (courseEditorCodeEl) courseEditorCodeEl.textContent = code;
     }
     setStoredData(data);
-    refreshCoursesPanel();
-    courseSelect.value = code;
   }
-
-  courseSelect.addEventListener('change', function () {
-    var code = this.value;
-    coursesHint.style.display = code ? 'none' : 'block';
-    if (courseDelete) courseDelete.style.display = code ? '' : 'none';
-    if (!code) {
-      courseEditor.style.display = 'none';
-      currentCourseCode = null;
-      return;
-    }
-    var data = getStoredData();
-    var course = (data.courses || []).find(function (c) { return c.code === code; });
-    currentCourseCode = code;
-    editFolder.value = course ? (course.folder || '') : '';
-    editCode.value = course ? course.code : code;
-    editName.value = course ? course.name : '';
-    editEnabled.checked = course ? (course.enabled !== false) : true;
-    renderSlots(course ? course.timetable : []);
-    courseEditor.style.display = 'block';
-  });
 
   slotAdd.addEventListener('click', function () {
     addSlotRow(null, slotsList.children.length);
   });
 
   courseAdd.addEventListener('click', function () {
-    var code = prompt('Course code (e.g. IENDCY336):');
+    var code = prompt('Course code (e.g. IENDCY336) — this will also be the folder name:');
     if (!code || !code.trim()) return;
     code = code.trim();
+    if (!/^[A-Za-z0-9_-]+$/.test(code)) {
+      alert('Course code must contain only letters, numbers, underscores, or hyphens (no spaces or slashes), since it is also used as a folder name.');
+      return;
+    }
     var data = getStoredData();
     if ((data.courses || []).some(function (c) { return c.code === code; })) {
-      courseSelect.value = code;
-      courseSelect.dispatchEvent(new Event('change'));
+      openCourseEditor(code);
       return;
     }
     data.courses = data.courses || [];
-    data.courses.push({ code: code, name: '', timetable: [] });
+    data.courses.push({ code: code, name: '', folder: code, enabled: true, timetable: [] });
     setStoredData(data);
-    refreshCoursesPanel();
-    courseSelect.value = code;
-    courseSelect.dispatchEvent(new Event('change'));
+    refreshCourseCards();
+    openCourseEditor(code);
   });
 
-  editCode.addEventListener('blur', saveCurrentCourse);
-  editName.addEventListener('blur', saveCurrentCourse);
-  editFolder.addEventListener('blur', function () {
-    saveCurrentCourse();
-    refreshCoursesPanel();
-  });
-  editEnabled.addEventListener('change', saveCurrentCourse);
+  if (courseDelete) {
+    courseDelete.addEventListener('click', function () {
+      if (!currentCourseCode) return;
+      if (!confirm('Delete course "' + currentCourseCode + '"? This removes the course and its timetable.')) return;
+      var data = getStoredData();
+      data.courses = (data.courses || []).filter(function (c) { return c.code !== currentCourseCode; });
+      setStoredData(data);
+      closeCourseEditor();
+    });
+  }
+
+  var courseSaveBtn = document.getElementById('courseSave');
+  if (courseSaveBtn) {
+    courseSaveBtn.addEventListener('click', function () {
+      saveCurrentCourse();
+      refreshCourseCards();
+      alert('Course saved.');
+    });
+  }
+
+  editCode.addEventListener('blur', function () { saveCurrentCourse(); refreshCourseCards(); });
+  editName.addEventListener('blur', function () { saveCurrentCourse(); refreshCourseCards(); });
+  editFolder.addEventListener('blur', function () { saveCurrentCourse(); refreshCourseCards(); });
   slotsList.addEventListener('change', saveCurrentCourse);
   slotsList.addEventListener('input', function () {
     clearTimeout(slotsList._saveTimer);
     slotsList._saveTimer = setTimeout(saveCurrentCourse, 800);
   });
 
-  // Course JSON upload
-  if (courseUploadBrowse) {
-    courseUploadBrowse.addEventListener('click', function () {
-      courseJsonInput.click();
-    });
+  // Course-level upload with drag-and-drop and preview
+  function courseHandleFile(file) {
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var json = JSON.parse(reader.result);
+        var rawSlots = [];
+        if (Array.isArray(json.timetable)) {
+          rawSlots = json.timetable;
+        } else if (Array.isArray(json.courses)) {
+          var found = json.courses.find(function (c) { return c.code === currentCourseCode; });
+          rawSlots = (found || json.courses[0] || {}).timetable || [];
+        } else if (isCUTFormat(json)) {
+          var conv = convertCUTFormatToApp(json);
+          var found2 = (conv.courses || []).find(function (c) { return c.code === currentCourseCode; });
+          rawSlots = (found2 || conv.courses[0] || {}).timetable || [];
+        } else if (Array.isArray(json)) {
+          rawSlots = json;
+        }
+        if (!rawSlots.length) { alert('No timetable slots found in this file.'); return; }
+        pendingCourseUpload = rawSlots;
+        if (courseUploadPreviewJsonEl) courseUploadPreviewJsonEl.textContent = JSON.stringify(rawSlots.slice(0, 3), null, 2) + (rawSlots.length > 3 ? '\n\n... and ' + (rawSlots.length - 3) + ' more slots' : '');
+        if (courseUploadPreviewSummaryEl) courseUploadPreviewSummaryEl.textContent = rawSlots.length + ' slot' + (rawSlots.length !== 1 ? 's' : '') + ' found. This will replace this course\'s current timetable.';
+        if (courseUploadPreviewEl) courseUploadPreviewEl.style.display = 'block';
+      } catch (e) { alert('Invalid JSON: ' + e.message); }
+    };
+    reader.readAsText(file);
   }
 
-  if (courseJsonInput) {
-    courseJsonInput.addEventListener('change', function () {
-      var file = this.files[0];
-      if (!file) return;
-      var reader = new FileReader();
-      reader.onload = function () {
-        try {
-          var json = JSON.parse(reader.result);
-          if (currentCourseCode && json.timetable && Array.isArray(json.timetable)) {
-            var data = getStoredData();
-            var course = (data.courses || []).find(function (c) { return c.code === currentCourseCode; });
-            if (course) {
-              course.timetable = json.timetable;
-              setStoredData(data);
-              renderSlots(json.timetable);
-              alert('Timetable data imported successfully!');
-              saveCurrentCourse();
-            }
-          } else {
-            alert('Invalid JSON format. Expected a "timetable" array.');
-          }
-        } catch (e) {
-          alert('Failed to parse JSON: ' + e.message);
-        }
-      };
-      reader.readAsText(file);
-      this.value = '';
+  if (courseUploadBrowseBtn) courseUploadBrowseBtn.addEventListener('click', function () { if (courseJsonInputEl) courseJsonInputEl.click(); });
+  if (courseJsonInputEl) courseJsonInputEl.addEventListener('change', function () { if (this.files && this.files[0]) courseHandleFile(this.files[0]); this.value = ''; });
+  if (courseUploadZoneEl) {
+    courseUploadZoneEl.addEventListener('dragover', function (e) { e.preventDefault(); courseUploadZoneEl.classList.add('drag-over'); });
+    courseUploadZoneEl.addEventListener('dragleave', function () { courseUploadZoneEl.classList.remove('drag-over'); });
+    courseUploadZoneEl.addEventListener('drop', function (e) {
+      e.preventDefault(); courseUploadZoneEl.classList.remove('drag-over');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) courseHandleFile(e.dataTransfer.files[0]);
     });
   }
+  if (courseUploadConfirmBtn) {
+    courseUploadConfirmBtn.addEventListener('click', function () {
+      if (!pendingCourseUpload || !currentCourseCode) return;
+      var data = getStoredData();
+      var course = (data.courses || []).find(function (c) { return c.code === currentCourseCode; });
+      if (course) {
+        course.timetable = pendingCourseUpload;
+        setStoredData(data);
+        renderSlots(pendingCourseUpload);
+        if (courseUploadPreviewEl) courseUploadPreviewEl.style.display = 'none';
+        pendingCourseUpload = null;
+        refreshCourseCards();
+        alert('Imported ' + course.timetable.length + ' slot' + (course.timetable.length !== 1 ? 's' : '') + '.');
+      }
+    });
+  }
+  if (courseUploadCancelBtn) courseUploadCancelBtn.addEventListener('click', function () { pendingCourseUpload = null; if (courseUploadPreviewEl) courseUploadPreviewEl.style.display = 'none'; });
 
   // —— Lecturers panel ——
   var lecturersList = document.getElementById('lecturersList');
@@ -715,31 +841,6 @@
     });
   }
 
-  // —— Delete course ——
-  if (courseDelete) {
-    courseDelete.addEventListener('click', function () {
-      if (!currentCourseCode) return;
-      if (!confirm('Delete course "' + currentCourseCode + '"? This removes the course and its timetable.')) return;
-      var data = getStoredData();
-      data.courses = (data.courses || []).filter(function (c) { return c.code !== currentCourseCode; });
-      setStoredData(data);
-      currentCourseCode = null;
-      courseEditor.style.display = 'none';
-      courseDelete.style.display = 'none';
-      coursesHint.style.display = 'block';
-      refreshCoursesPanel();
-    });
-  }
-
-  // —— Save course button (explicit) ——
-  var courseSaveBtn = document.getElementById('courseSave');
-  if (courseSaveBtn) {
-    courseSaveBtn.addEventListener('click', function () {
-      saveCurrentCourse();
-      alert('Course saved.');
-    });
-  }
-
   // —— Data management panel ——
   var dataExport = document.getElementById('dataExport');
   var dataClear = document.getElementById('dataClear');
@@ -821,6 +922,57 @@
     });
   }
 
+  function migrateCourseCodes() {
+    var data = getStoredData();
+    if (!data.courses || !data.courses.length) return;
+    var changed = false;
+    data.courses.forEach(function (c) {
+      if (typeof c.code === 'string' && /_Year(\d+)$/.test(c.code)) {
+        c.code = c.code.replace(/_Year(\d+)$/, '_$1');
+        changed = true;
+      }
+    });
+    if (changed) setStoredData(data);
+  }
+
+  function initAdminFromBundle() {
+    migrateCourseCodes();
+    var d = getStoredData();
+    if (d.courses && d.courses.length) return;
+    fetch('timetable/bundle.json')
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (bundle) {
+        var data = getStoredData();
+        if (data.courses && data.courses.length) return;
+        var courses = [];
+        var lecturers = data.lecturers || {};
+        (bundle.programs || []).forEach(function (prog) {
+          if (prog.lecturers && typeof prog.lecturers === 'object') {
+            Object.keys(prog.lecturers).forEach(function (id) {
+              lecturers[id] = prog.lecturers[id];
+            });
+          }
+          (prog.years || []).forEach(function (y) {
+            var yearNum = parseInt(y.year, 10) || y.year;
+            courses.push({
+              code: prog.code + '_' + y.year,
+              name: prog.name + ' · Year ' + yearNum,
+              folder: prog.code,
+              enabled: true,
+              timetable: Array.isArray(y.timetable) ? y.timetable : []
+            });
+          });
+        });
+        data.courses = courses;
+        data.lecturers = lecturers;
+        setStoredData(data);
+        refreshCoursesPanel();
+        refreshLecturersPanel();
+      })
+      .catch(function () {});
+  }
+
+  initAdminFromBundle();
   refreshCoursesPanel();
   loadVenuePreviews();
   loadVenueInstructions();
