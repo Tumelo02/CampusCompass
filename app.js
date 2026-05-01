@@ -106,7 +106,7 @@
   // timetable files + per-program lecturers file.
 
   function fetchJson(url) {
-    return fetch(url, { cache: 'no-store' }).then(function (r) {
+    return fetch(url).then(function (r) {
       if (!r.ok) throw new Error('Failed to load ' + url + ' (' + r.status + ')');
       return r.json();
     });

@@ -1,9 +1,10 @@
 {
+  "scripts": {
+    "build": "node compress-images.js"
+  },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^2.0.0"
-  },
-  "devDependencies": {
+    "@vercel/speed-insights": "^2.0.0",
     "sharp": "^0.34.5"
   }
 }
