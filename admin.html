@@ -135,8 +135,19 @@
         </div>
         <div class="course-editor" id="courseEditor" style="display: none;">
           <div class="course-editor-meta">
+            <label>Folder/Category (e.g. Engineering, Medicine) <input type="text" id="editFolder" placeholder="e.g. Engineering_Built_Environment" /></label>
             <label>Course code <input type="text" id="editCode" placeholder="e.g. IENDCY336" /></label>
             <label>Display name <input type="text" id="editName" placeholder="e.g. Industrial Engineering · Year 3" /></label>
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="checkbox" id="editEnabled" />
+              <span>Enabled (show to users)</span>
+            </label>
+          </div>
+          <h3>Upload JSON timetable</h3>
+          <p class="admin-hint">Upload a JSON file with timetable data for this course.</p>
+          <div class="upload-zone-small" id="courseUploadZone">
+            <input type="file" id="courseJsonInput" accept=".json,application/json" hidden />
+            <button type="button" class="btn btn-secondary btn-small" id="courseUploadBrowse">Upload timetable JSON</button>
           </div>
           <h3>Timetable slots</h3>
           <div class="slots-toolbar">

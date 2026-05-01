@@ -381,7 +381,7 @@
 
   function buildCourseList() {
     venueImageData = getVenueImages();
-    var courses = appData.courses || [];
+    var courses = (appData.courses || []).filter(function (c) { return c.enabled !== false; });
     courseListEl.innerHTML = '';
 
     if (courses.length === 0) {

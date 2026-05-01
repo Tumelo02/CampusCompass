@@ -290,13 +290,16 @@
   var courseSelect = document.getElementById('courseSelect');
   var courseEditor = document.getElementById('courseEditor');
   var coursesHint = document.getElementById('coursesHint');
+  var editFolder = document.getElementById('editFolder');
   var editCode = document.getElementById('editCode');
   var editName = document.getElementById('editName');
+  var editEnabled = document.getElementById('editEnabled');
   var slotsList = document.getElementById('slotsList');
   var slotAdd = document.getElementById('slotAdd');
   var courseAdd = document.getElementById('courseAdd');
-
   var courseDelete = document.getElementById('courseDelete');
+  var courseJsonInput = document.getElementById('courseJsonInput');
+  var courseUploadBrowse = document.getElementById('courseUploadBrowse');
   var currentCourseCode = null;
   var DAYS = ['mon', 'tue', 'wed', 'thu', 'fri'];
 
@@ -304,13 +307,30 @@
     var data = getStoredData();
     var courses = data.courses || [];
     courseSelect.innerHTML = '<option value="">Select a course…</option>';
+    
+    // Group courses by folder
+    var grouped = {};
     courses.forEach(function (c) {
       if (!c.code) return;
-      var opt = document.createElement('option');
-      opt.value = c.code;
-      opt.textContent = c.code + (c.name ? ' · ' + c.name : '');
-      courseSelect.appendChild(opt);
+      var folder = c.folder || 'Other';
+      if (!grouped[folder]) grouped[folder] = [];
+      grouped[folder].push(c);
     });
+    
+    // Add optgroups for each folder
+    var folders = Object.keys(grouped).sort();
+    folders.forEach(function (folder) {
+      var optgroup = document.createElement('optgroup');
+      optgroup.label = folder;
+      grouped[folder].forEach(function (c) {
+        var opt = document.createElement('option');
+        opt.value = c.code;
+        opt.textContent = c.code + (c.name ? ' · ' + c.name : '');
+        optgroup.appendChild(opt);
+      });
+      courseSelect.appendChild(optgroup);
+    });
+    
     if (currentCourseCode && courseSelect.value !== currentCourseCode) {
       currentCourseCode = null;
       courseEditor.style.display = 'none';
@@ -385,15 +405,19 @@
     var data = getStoredData();
     var code = editCode.value.trim();
     var name = editName.value.trim();
+    var folder = editFolder.value.trim();
     if (!code) return;
     var timetable = getSlotsFromForm();
+    var enabled = editEnabled.checked;
     var existing = (data.courses || []).find(function (c) { return c.code === currentCourseCode; });
     if (existing) {
       existing.code = code;
       existing.name = name;
+      existing.folder = folder || 'Other';
+      existing.enabled = enabled;
       existing.timetable = timetable;
     } else {
-      data.courses.push({ code: code, name: name, timetable: timetable });
+      data.courses.push({ code: code, name: name, folder: folder || 'Other', enabled: enabled, timetable: timetable });
     }
     if (code !== currentCourseCode) {
       data.courses = data.courses.filter(function (c) { return c.code !== currentCourseCode; });
@@ -416,8 +440,10 @@
     var data = getStoredData();
     var course = (data.courses || []).find(function (c) { return c.code === code; });
     currentCourseCode = code;
+    editFolder.value = course ? (course.folder || '') : '';
     editCode.value = course ? course.code : code;
     editName.value = course ? course.name : '';
+    editEnabled.checked = course ? (course.enabled !== false) : true;
     renderSlots(course ? course.timetable : []);
     courseEditor.style.display = 'block';
   });
@@ -446,11 +472,53 @@
 
   editCode.addEventListener('blur', saveCurrentCourse);
   editName.addEventListener('blur', saveCurrentCourse);
+  editFolder.addEventListener('blur', function () {
+    saveCurrentCourse();
+    refreshCoursesPanel();
+  });
+  editEnabled.addEventListener('change', saveCurrentCourse);
   slotsList.addEventListener('change', saveCurrentCourse);
   slotsList.addEventListener('input', function () {
     clearTimeout(slotsList._saveTimer);
     slotsList._saveTimer = setTimeout(saveCurrentCourse, 800);
   });
+
+  // Course JSON upload
+  if (courseUploadBrowse) {
+    courseUploadBrowse.addEventListener('click', function () {
+      courseJsonInput.click();
+    });
+  }
+
+  if (courseJsonInput) {
+    courseJsonInput.addEventListener('change', function () {
+      var file = this.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          var json = JSON.parse(reader.result);
+          if (currentCourseCode && json.timetable && Array.isArray(json.timetable)) {
+            var data = getStoredData();
+            var course = (data.courses || []).find(function (c) { return c.code === currentCourseCode; });
+            if (course) {
+              course.timetable = json.timetable;
+              setStoredData(data);
+              renderSlots(json.timetable);
+              alert('Timetable data imported successfully!');
+              saveCurrentCourse();
+            }
+          } else {
+            alert('Invalid JSON format. Expected a "timetable" array.');
+          }
+        } catch (e) {
+          alert('Failed to parse JSON: ' + e.message);
+        }
+      };
+      reader.readAsText(file);
+      this.value = '';
+    });
+  }
 
   // —— Lecturers panel ——
   var lecturersList = document.getElementById('lecturersList');
@@ -489,7 +557,7 @@
     });
     lecturersList.querySelectorAll('.lecturer-delete').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        if (!confirm('Delete lecturer “‘ + btn.dataset.id + '”? Timetable slots using this id will show no lecturer details.')) return;
+        if (!confirm('Delete lecturer "' + btn.dataset.id + '"? Timetable slots using this id will show no lecturer details.')) return;
         var data = getStoredData();
         if (data.lecturers[btn.dataset.id]) delete data.lecturers[btn.dataset.id];
         setStoredData(data);
