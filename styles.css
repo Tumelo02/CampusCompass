@@ -1506,7 +1506,7 @@ body {
   .day-header-date { font-size: 0.95rem; }
   .slot {
     grid-column: unset !important;
-    grid-row: unset !important;
+    grid-row: unset;
     border-radius: var(--radius-sm);
     padding: 0.65rem 0.75rem;
     font-size: 0.85rem;
