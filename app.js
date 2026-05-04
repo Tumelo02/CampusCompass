@@ -64,6 +64,8 @@
   var TIMETABLE_INDEX_URL = 'timetable/index.json';
   var TIMETABLE_BUNDLE_URL = 'timetable/bundle.json';
   var TIMETABLE_CACHE_KEY = 'timetable_bundle_cache_v1';
+  var VISIBILITY_API_URL = '/api/visibility';
+  var liveDisabledCodes = null;
 
   function getSemesterLabel() {
     try {
@@ -213,7 +215,10 @@
   function bundleToAppData(bundle) {
     var overrides = getAdminOverrides();
     var bundleDisabled = {};
-    (Array.isArray(bundle.disabledCodes) ? bundle.disabledCodes : []).forEach(function (c) {
+    var disabledSource = Array.isArray(liveDisabledCodes)
+      ? liveDisabledCodes
+      : (Array.isArray(bundle.disabledCodes) ? bundle.disabledCodes : []);
+    disabledSource.forEach(function (c) {
       bundleDisabled[c] = true;
     });
     var courses = [];
@@ -308,10 +313,23 @@
     });
   }
 
+  function fetchLiveVisibility() {
+    return fetch(VISIBILITY_API_URL, { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (data) {
+        if (data && Array.isArray(data.disabledCodes)) {
+          liveDisabledCodes = data.disabledCodes;
+        }
+      })
+      .catch(function () { /* fall back to bundle.disabledCodes */ });
+  }
+
   function loadTimetableIndex() {
-    return loadFromBundle().catch(function (err) {
-      console.warn('[timetable] bundle.json unavailable, falling back:', err.message);
-      return loadFromLegacyIndex();
+    return fetchLiveVisibility().then(function () {
+      return loadFromBundle().catch(function (err) {
+        console.warn('[timetable] bundle.json unavailable, falling back:', err.message);
+        return loadFromLegacyIndex();
+      });
     });
   }
 

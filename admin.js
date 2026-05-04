@@ -419,20 +419,20 @@
 
   function refreshCoursesPanel() { refreshCourseCards(); refreshPublishBanner(); }
 
-  var deployedBundle = null;
-  var deployedDisabledSet = null;
+  var liveDisabledSet = null;
+  var liveLoadFailed = false;
 
-  function fetchDeployedBundle() {
-    return fetch('timetable/bundle.json', { cache: 'no-store' })
+  function fetchLiveDisabledCodes() {
+    return fetch('/api/visibility', { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function (b) {
-        deployedBundle = b;
-        deployedDisabledSet = {};
-        (Array.isArray(b.disabledCodes) ? b.disabledCodes : []).forEach(function (c) {
-          deployedDisabledSet[c] = true;
+      .then(function (data) {
+        liveDisabledSet = {};
+        (Array.isArray(data && data.disabledCodes) ? data.disabledCodes : []).forEach(function (c) {
+          liveDisabledSet[c] = true;
         });
-        return b;
-      });
+        liveLoadFailed = false;
+      })
+      .catch(function () { liveLoadFailed = true; });
   }
 
   function getLocalDisabledCodes() {
@@ -445,23 +445,28 @@
     return out;
   }
 
-  function diffDeployedVsLocal() {
+  function diffLiveVsLocal() {
     var local = getLocalDisabledCodes();
-    if (!deployedDisabledSet) return { added: local, removed: [], total: local.length };
+    if (!liveDisabledSet) return { added: local, removed: [], total: local.length };
     var localSet = {};
     local.forEach(function (c) { localSet[c] = true; });
-    var added = local.filter(function (c) { return !deployedDisabledSet[c]; });
-    var removed = Object.keys(deployedDisabledSet).filter(function (c) { return !localSet[c]; });
+    var added = local.filter(function (c) { return !liveDisabledSet[c]; });
+    var removed = Object.keys(liveDisabledSet).filter(function (c) { return !localSet[c]; });
     return { added: added, removed: removed, total: added.length + removed.length };
   }
 
   function refreshPublishBanner() {
     if (!publishBanner || !publishBannerDetail) return;
-    if (!deployedBundle) {
+    if (liveLoadFailed) {
+      publishBannerDetail.innerHTML = '<strong>Live visibility API unavailable.</strong> Set up Vercel KV and the <code>ADMIN_PASS_HASH</code> env var, then redeploy. Toggles only affect this device until then.';
+      publishBanner.style.display = 'flex';
+      return;
+    }
+    if (!liveDisabledSet) {
       publishBanner.style.display = 'none';
       return;
     }
-    var diff = diffDeployedVsLocal();
+    var diff = diffLiveVsLocal();
     if (diff.total === 0) {
       publishBanner.style.display = 'none';
       return;
@@ -469,34 +474,46 @@
     var bits = [];
     if (diff.added.length) bits.push(diff.added.length + ' newly hidden (' + diff.added.join(', ') + ')');
     if (diff.removed.length) bits.push(diff.removed.length + ' newly visible (' + diff.removed.join(', ') + ')');
-    publishBannerDetail.innerHTML = bits.join(' · ') + ' — click <em>Publish visibility</em> to download an updated <code>bundle.json</code>, then commit it and push so mobile/other devices reflect the change.';
+    publishBannerDetail.innerHTML = bits.join(' · ') + ' — click <em>Publish visibility</em> to push these changes live so mobile and other devices update instantly.';
     publishBanner.style.display = 'flex';
   }
 
   function publishVisibility() {
-    if (!deployedBundle) {
-      alert('Could not load deployed bundle.json. Make sure you are running the admin from the deployed site (or have it served locally) and try again.');
+    var pw;
+    try { pw = sessionStorage.getItem('admin_pw'); } catch (e) { pw = null; }
+    if (!pw) {
+      alert('Authentication expired. Please refresh the page and sign in again.');
       return;
     }
-    var bundle = JSON.parse(JSON.stringify(deployedBundle));
-    bundle.disabledCodes = getLocalDisabledCodes();
-    var blob = new Blob([JSON.stringify(bundle)], { type: 'application/json' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'bundle.json';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
-    alert(
-      'Downloaded bundle.json with ' + bundle.disabledCodes.length + ' hidden course' +
-      (bundle.disabledCodes.length === 1 ? '' : 's') + '.\n\n' +
-      'Next steps:\n' +
-      '1. Replace timetable/bundle.json in your repo with this file\n' +
-      '2. git add timetable/bundle.json && git commit -m "Update course visibility"\n' +
-      '3. git push\n' +
-      'Vercel will rebuild and the change will appear on all devices.'
-    );
+    var codes = getLocalDisabledCodes();
+    var prev = coursePublish ? coursePublish.textContent : null;
+    if (coursePublish) { coursePublish.disabled = true; coursePublish.textContent = 'Publishing…'; }
+    fetch('/api/visibility', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + pw
+      },
+      body: JSON.stringify({ disabledCodes: codes })
+    })
+      .then(function (r) {
+        if (r.status === 401) throw new Error('Server rejected the passcode. Check the ADMIN_PASS_HASH env var on Vercel.');
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (resp) {
+        liveDisabledSet = {};
+        codes.forEach(function (c) { liveDisabledSet[c] = true; });
+        liveLoadFailed = false;
+        refreshPublishBanner();
+        alert('Published ' + (resp.count != null ? resp.count : codes.length) + ' hidden course' + ((resp.count === 1) ? '' : 's') + '. Mobile and other devices will see the change on next page load.');
+      })
+      .catch(function (err) {
+        alert('Publish failed: ' + err.message);
+      })
+      .finally(function () {
+        if (coursePublish) { coursePublish.disabled = false; coursePublish.textContent = prev || 'Publish visibility'; }
+      });
   }
 
   if (coursePublish) coursePublish.addEventListener('click', publishVisibility);
@@ -1060,7 +1077,7 @@
 
   initAdminFromBundle();
   refreshCoursesPanel();
-  fetchDeployedBundle().then(refreshPublishBanner).catch(function () {});
+  fetchLiveDisabledCodes().then(refreshPublishBanner);
   loadVenuePreviews();
   loadVenueInstructions();
 })();

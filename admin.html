@@ -301,7 +301,10 @@
 
       sha256Hex(attempt).then(function (hex) {
         if (hex === ADMIN_PASS_HASH) {
-          try { sessionStorage.setItem('admin_authenticated', 'true'); } catch (e) {}
+          try {
+            sessionStorage.setItem('admin_authenticated', 'true');
+            sessionStorage.setItem('admin_pw', attempt);
+          } catch (e) {}
           setFailedAttempts(0);
           document.getElementById('authModal').style.display = 'none';
           document.getElementById('adminApp').style.display = 'block';
