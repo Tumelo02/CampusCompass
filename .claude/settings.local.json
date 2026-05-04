@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($file = \"c:\\\\Users\\\\mango\\\\OneDrive\\\\Documents\\\\Student-Timetable-main\\\\timetable\\\\bundle.json\"; \\(Get-Content $file -Raw\\) -replace 'Engineering_Built_Environment_Information_Technology', 'courses' | Set-Content $file -NoNewline -Encoding utf8)"
+    ]
+  }
+}
