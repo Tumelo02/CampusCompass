@@ -1564,10 +1564,11 @@ body {
   .timetable.filter-wed .day-column:not([data-day="wed"]) { display: none; }
   .timetable.filter-thu .day-column:not([data-day="thu"]) { display: none; }
   .timetable.filter-fri .day-column:not([data-day="fri"]) { display: none; }
+  /* Keep the time column and single day column layout intact */
   .timetable.filter-mon, .timetable.filter-tue,
   .timetable.filter-wed, .timetable.filter-thu,
   .timetable.filter-fri {
-    grid-template-columns: 1fr;
+    grid-template-columns: 72px 1fr;
   }
 }
 
