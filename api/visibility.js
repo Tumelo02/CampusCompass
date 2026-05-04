@@ -1,5 +1,10 @@
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
 import crypto from 'crypto';
+
+const redis = new Redis({
+  url: process.env.STORAGE_KV_REST_API_URL,
+  token: process.env.STORAGE_KV_REST_API_TOKEN,
+});
 
 const KV_KEY = 'admin:disabledCodes';
 const MAX_CODES = 1000;
@@ -19,7 +24,7 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const list = await kv.get(KV_KEY);
+      const list = await redis.get(KV_KEY);
       return res.status(200).json({
         disabledCodes: Array.isArray(list) ? list : []
       });
@@ -46,7 +51,7 @@ export default async function handler(req, res) {
         .filter(c => typeof c === 'string' && CODE_PATTERN.test(c))
         .slice(0, MAX_CODES);
 
-      await kv.set(KV_KEY, sanitized);
+      await redis.set(KV_KEY, sanitized);
       return res.status(200).json({ ok: true, count: sanitized.length });
     }
 
