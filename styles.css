@@ -180,6 +180,11 @@ body {
 .profile-btn svg { width: 20px; height: 20px; }
 .profile-btn.open { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
 
+.install-btn { color: var(--accent); border-color: rgba(255, 107, 74, 0.45); }
+.install-btn svg { width: 18px; height: 18px; }
+.install-btn:hover { background: var(--accent-soft); }
+.install-btn[hidden] { display: none !important; }
+
 .profile-menu {
   position: absolute;
   top: calc(100% + 0.5rem);
