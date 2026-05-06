@@ -114,6 +114,9 @@
     });
   }
 
+  var MINS_PER_ROW = 5; // grid resolution: 1 row = 5 minutes (12 rows per hour)
+  var GRID_START_HOUR = 7; // timetable starts at 07:00 (earliest class is 7:55 AM)
+
   function parseTimeRange(str) {
     var m = (str || '').match(/(\d+):(\d+)\s*(AM|PM)\s*-\s*(\d+):(\d+)\s*(AM|PM)/i);
     if (!m) return { start: 8, span: 1, startHour: 8, startMinute: 0, endHour: 9, endMinute: 0 };
@@ -123,16 +126,28 @@
     var em = parseInt(m[5], 10);
     var startMin = sh * 60 + sm;
     var endMin = eh * 60 + em;
-    var start = Math.round(startMin / 60);
-    var span = Math.max(1, Math.round((endMin - startMin) / 60));
-    return { 
-      start: start, 
+    // start = whole hour (for day-ordering logic); span = whole hours (legacy, kept for compat)
+    var start = Math.floor(startMin / 60);
+    var span = Math.max(1, Math.ceil((endMin - startMin) / 60));
+    return {
+      start: start,
       span: span,
       startHour: sh,
       startMinute: sm,
       endHour: eh,
       endMinute: em
     };
+  }
+
+  // Convert exact time to a grid row number (1-indexed; row 1 = header, row 2 = GRID_START_HOUR:00)
+  function timeToGridRow(hour, minute) {
+    var offsetMins = (hour - GRID_START_HOUR) * 60 + minute;
+    return Math.max(2, 2 + Math.round(offsetMins / MINS_PER_ROW));
+  }
+
+  // Convert duration in minutes to grid row span
+  function durationToSpan(durationMins) {
+    return Math.max(1, Math.ceil(durationMins / MINS_PER_ROW));
   }
 
   function parseRoom(str) {
@@ -535,14 +550,15 @@
   // ── Dynamic timetable grid ─────────────────────────────────────────────────
 
   function calculateMaxEndHour(timetable) {
-    var maxEndHour = 16; // Default minimum
+    var maxEndHour = 17; // Default minimum (covers up to 17:00)
     (timetable || []).forEach(function (slot) {
+      var endHour;
       if (slot.endHour !== undefined) {
-        maxEndHour = Math.max(maxEndHour, slot.endHour);
+        endHour = slot.endHour + ((slot.endMinute || 0) > 0 ? 1 : 0);
       } else if (slot.start !== undefined && slot.span !== undefined) {
-        var endHour = slot.start + slot.span;
-        maxEndHour = Math.max(maxEndHour, endHour);
+        endHour = slot.start + slot.span;
       }
+      if (endHour !== undefined) maxEndHour = Math.max(maxEndHour, endHour);
     });
     return maxEndHour;
   }
@@ -550,22 +566,27 @@
   function updateTimeColumn(maxEndHour) {
     var timeColumn = document.querySelector('.time-column');
     if (!timeColumn) return;
-    
-    // Keep the header cell, remove all other cells
+
     var cells = timeColumn.querySelectorAll('.time-cell:not(.header-cell)');
     cells.forEach(function (cell) { cell.remove(); });
-    
-    // Add time cells for each hour from 08:00 to maxEndHour
-    for (var hour = 8; hour < maxEndHour; hour++) {
+
+    var rowsPerHour = 60 / MINS_PER_ROW; // 12
+
+    for (var hour = GRID_START_HOUR; hour < maxEndHour; hour++) {
+      // Time label — spans one full hour block in the time-column subgrid
       var cell = document.createElement('div');
       cell.className = 'time-cell';
       cell.textContent = (hour < 10 ? '0' : '') + hour + ':00';
+      var rowInCol = 2 + (hour - GRID_START_HOUR) * rowsPerHour;
+      cell.style.gridRow = rowInCol + ' / span ' + rowsPerHour;
       timeColumn.appendChild(cell);
+
     }
-    
-    // Update grid-template-rows based on number of hours
-    var numRows = (maxEndHour - 8) + 1; // +1 for header row
-    var newGridRows = '40px repeat(' + numRows + ', minmax(44px, 1fr))';
+
+    // Fine-grained grid rows: 1 header row + (numHours × rowsPerHour) tiny rows
+    var numHours = maxEndHour - GRID_START_HOUR;
+    var totalFineRows = numHours * rowsPerHour;
+    var newGridRows = '40px repeat(' + totalFineRows + ', minmax(0, 1fr))';
     timetableEl.style.gridTemplateRows = newGridRows;
   }
 
@@ -608,50 +629,53 @@
       (timetable || []).forEach(function (s) { if (s.day === day) daySlots.push(s); });
       daySlots.sort(function (a, b) { return a.start - b.start; });
 
-      // Detect overlapping slots to position them side-by-side
-      var slotMap = {}; // Maps 'start-span' to array of slots
-      daySlots.forEach(function (s) {
-        if (!s.break) {
-          var key = s.start + '-' + (s.span || 1);
-          if (!slotMap[key]) slotMap[key] = [];
-          slotMap[key].push(s);
+      // Compute exact minute bounds for each non-break slot
+      var nonBreakSlots = daySlots.filter(function (s) { return !s.break; });
+      var gridStartMin = GRID_START_HOUR * 60;
+      var gridEndMin = maxEndHour * 60;
+      var totalGridMins = gridEndMin - gridStartMin;
+
+      nonBreakSlots.forEach(function (s) {
+        var sh2 = s.startHour !== undefined ? s.startHour : s.start;
+        var sm2 = s.startMinute !== undefined ? s.startMinute : 0;
+        var eh2 = s.endHour !== undefined ? s.endHour : (s.start + (s.span || 1));
+        var em2 = s.endMinute !== undefined ? s.endMinute : 0;
+        s._startMin = sh2 * 60 + sm2;
+        s._endMin = eh2 * 60 + em2;
+      });
+
+      // Lane-sweep overlap detection: each lane is a column within the day's slot area
+      var lanes = []; // each entry = end minute of last slot placed in that lane
+      nonBreakSlots.sort(function (a, b) { return a._startMin - b._startMin || a._endMin - b._endMin; });
+      nonBreakSlots.forEach(function (s) {
+        var placed = false;
+        for (var li = 0; li < lanes.length; li++) {
+          if (s._startMin >= lanes[li]) {
+            s._lane = li;
+            lanes[li] = s._endMin;
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) {
+          s._lane = lanes.length;
+          lanes.push(s._endMin);
         }
       });
 
-      daySlots.forEach(function (slotData) {
-        var start = parseInt(slotData.start, 10) || 8;
-        var span = parseInt(slotData.span, 10) || 1;
-        var colIndex = dayToCol[day];
-        var rowStart = start - 6;
-
-        var slot = document.createElement('div');
-        slot.className = 'slot';
-        slot.style.gridColumn = colIndex;
-        slot.style.gridRow = rowStart + ' / span ' + span;
-
-        // Handle overlapping slots - position them side-by-side
-        if (!slotData.break) {
-          var overlapKey = start + '-' + span;
-          var overlapSlots = slotMap[overlapKey] || [];
-          if (overlapSlots.length > 1) {
-            var overlapIndex = overlapSlots.indexOf(slotData);
-            var overlapCount = overlapSlots.length;
-            slot.dataset.overlapIndex = overlapIndex;
-            slot.dataset.overlapCount = overlapCount;
-            slot.style.width = (100 / overlapCount) + '%';
-            slot.style.position = 'absolute';
-            slot.style.left = (overlapIndex * 100 / overlapCount) + '%';
-            slot.classList.add('overlapping');
+      // For each slot determine how many lanes are concurrently active (its group width)
+      nonBreakSlots.forEach(function (s) {
+        var maxLane = s._lane;
+        nonBreakSlots.forEach(function (other) {
+          if (other !== s && other._startMin < s._endMin && other._endMin > s._startMin) {
+            if (other._lane > maxLane) maxLane = other._lane;
           }
-        }
+        });
+        s._groupLanes = maxLane + 1;
+      });
 
-        if (slotData.break) {
-          slot.classList.add('break');
-          slot.textContent = slotData.subject || 'Break';
-          col.appendChild(slot);
-          return;
-        }
-
+      // Slot body builder \u2014 shared between grid-positioned and absolute-positioned slots
+      function buildSlotContent(slot, slotData, start, span) {
         var subjectKey = subjectToKey(slotData.subject);
         slot.dataset.subject = subjectKey;
         if (slotData.venue) slot.dataset.venue = slotData.venue;
@@ -670,12 +694,10 @@
 
         var timeMeta = document.createElement('span');
         timeMeta.className = 'slot-time meta';
-        // Display exact times: use startHour/startMinute and endHour/endMinute if available
         if (slotData.startHour !== undefined && slotData.startMinute !== undefined &&
             slotData.endHour !== undefined && slotData.endMinute !== undefined) {
-          var startTimeStr = formatTimeExact(slotData.startHour, slotData.startMinute);
-          var endTimeStr = formatTimeExact(slotData.endHour, slotData.endMinute);
-          timeMeta.textContent = startTimeStr + ' \u2013 ' + endTimeStr;
+          timeMeta.textContent = formatTimeExact(slotData.startHour, slotData.startMinute) +
+            ' \u2013 ' + formatTimeExact(slotData.endHour, slotData.endMinute);
         } else {
           timeMeta.textContent = formatTime(start) + ' \u2013 ' + formatTime(start + span);
         }
@@ -699,13 +721,84 @@
 
         if (slotData.lecturerId) {
           slot.style.cursor = 'pointer';
-          slot.addEventListener('click', function () {
-            openLecturerCard(slotData.lecturerId, slot);
-          });
+          slot.addEventListener('click', (function (lid, s) {
+            return function () { openLecturerCard(lid, s); };
+          })(slotData.lecturerId, slot));
         }
+      }
 
-        col.appendChild(slot);
-      });
+      // If any non-break slot overlaps another, use an absolute-positioned slot area
+      // that spans the whole day column, so slots can be placed side by side freely.
+      var hasOverlap = nonBreakSlots.some(function (s) { return s._groupLanes > 1; });
+
+      if (hasOverlap) {
+        // The slot area is a single grid cell spanning the full day column (rows 2 to end)
+        var slotArea = document.createElement('div');
+        slotArea.className = 'day-slot-area';
+        slotArea.style.gridColumn = dayToCol[day];
+        slotArea.style.gridRow = '2 / -1';
+
+        nonBreakSlots.forEach(function (slotData) {
+          var start = parseInt(slotData.start, 10) || 8;
+          var span = parseInt(slotData.span, 10) || 1;
+
+          var topPct = ((slotData._startMin - gridStartMin) / totalGridMins) * 100;
+          var heightPct = ((slotData._endMin - slotData._startMin) / totalGridMins) * 100;
+          var laneIndex = slotData._lane;
+          var laneCount = slotData._groupLanes;
+          var GAP = 2; // px gap between side-by-side overlapping slots
+
+          var slot = document.createElement('div');
+          slot.className = 'slot' + (laneCount > 1 ? ' overlapping' : '');
+          slot.style.position = 'absolute';
+          slot.style.top = 'calc(' + topPct.toFixed(4) + '% + 1px)';
+          slot.style.height = 'calc(' + heightPct.toFixed(4) + '% - 2px)';
+          if (laneCount > 1) {
+            // Use calc to add pixel gaps between lanes
+            var slotWidthPct = (100 / laneCount);
+            slot.style.left = 'calc(' + (laneIndex * slotWidthPct).toFixed(4) + '% + ' + (laneIndex > 0 ? GAP / 2 : 0) + 'px)';
+            slot.style.width = 'calc(' + slotWidthPct.toFixed(4) + '% - ' + (laneIndex > 0 && laneIndex < laneCount - 1 ? GAP : GAP / 2) + 'px)';
+          } else {
+            slot.style.left = '1px';
+            slot.style.width = 'calc(100% - 2px)';
+          }
+
+          buildSlotContent(slot, slotData, start, span);
+          slotArea.appendChild(slot);
+        });
+
+        col.appendChild(slotArea);
+      } else {
+        // No overlaps \u2014 place each slot as a direct grid item (original approach)
+        daySlots.forEach(function (slotData) {
+          var start = parseInt(slotData.start, 10) || 8;
+          var span = parseInt(slotData.span, 10) || 1;
+          var colIndex = dayToCol[day];
+
+          var sh = slotData.startHour !== undefined ? slotData.startHour : start;
+          var sm = slotData.startMinute !== undefined ? slotData.startMinute : 0;
+          var eh = slotData.endHour !== undefined ? slotData.endHour : (start + span);
+          var em = slotData.endMinute !== undefined ? slotData.endMinute : 0;
+          var durationMins = (eh * 60 + em) - (sh * 60 + sm);
+          var rowStart = timeToGridRow(sh, sm);
+          var rowSpan = durationToSpan(durationMins);
+
+          var slot = document.createElement('div');
+          slot.className = 'slot';
+          slot.style.gridColumn = colIndex;
+          slot.style.gridRow = rowStart + ' / span ' + rowSpan;
+
+          if (slotData.break) {
+            slot.classList.add('break');
+            slot.textContent = slotData.subject || 'Break';
+            col.appendChild(slot);
+            return;
+          }
+
+          buildSlotContent(slot, slotData, start, span);
+          col.appendChild(slot);
+        });
+      }
 
       timetableEl.appendChild(col);
     });
@@ -1178,7 +1271,7 @@
 
     var now = new Date();
     var hoursNow = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
-    if (hoursNow < 8 || hoursNow >= 17) return hide();
+    if (hoursNow < GRID_START_HOUR || hoursNow >= 20) return hide();
 
     var filterDay = getActiveFilterDay();
     if (filterDay && filterDay !== todayKey) return hide();
@@ -1191,10 +1284,10 @@
     var firstHourRect = timeCells[1].getBoundingClientRect();
     var ttRect = timetableEl.getBoundingClientRect();
     var todayRect = todayHeader.getBoundingClientRect();
-    var rowHeight = firstHourRect.height;
+    var rowHeight = firstHourRect.height; // height of one hour block (spans 12 fine rows)
     if (rowHeight <= 0) return hide();
 
-    var topPx = (firstHourRect.top - ttRect.top) + (hoursNow - 8) * rowHeight;
+    var topPx = (firstHourRect.top - ttRect.top) + (hoursNow - GRID_START_HOUR) * rowHeight;
 
     if (!line) {
       line = document.createElement('div');
