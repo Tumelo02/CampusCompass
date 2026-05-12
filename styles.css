@@ -1673,8 +1673,9 @@ body {
   .course-card { padding: 0.85rem 1rem; font-size: 0.9rem; }
   .course-card-desc { font-size: 0.8rem; }
   .venue-card { padding: 0.85rem 1rem; font-size: 0.9rem; }
-  .venue-card-floor { font-size: 0.72rem; }
-  .venue-card-desc { font-size: 0.8rem; }
+  .venue-card-title { font-size: 0.92rem; }
+  .venue-card-sub { font-size: 0.76rem; }
+  .venue-card-code { font-size: 0.7rem; }
 }
 
 /* Mobile day filter: hide entire day-column divs when filtering */
