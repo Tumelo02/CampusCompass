@@ -568,10 +568,15 @@
       titleSpan.className = 'venue-card-title';
       titleSpan.textContent = bldgName + ' — ' + floorLabel(v.floor);
 
-      // Subtitle: "Building 14 · Room 222"
+      // Subtitle: "Building 14 · Room 222" with raw code reference
       var subSpan = document.createElement('span');
       subSpan.className = 'venue-card-sub';
-      subSpan.textContent = 'Building ' + v.building + ' · Room ' + v.room;
+      subSpan.textContent = 'Building ' + v.building + ' · Room ' + v.room + '  ';
+
+      var codeSpan = document.createElement('span');
+      codeSpan.className = 'venue-card-code';
+      codeSpan.textContent = '(' + v.building + '|' + v.floor + '|' + v.room + ')';
+      subSpan.appendChild(codeSpan);
 
       btn.appendChild(titleSpan);
       btn.appendChild(subSpan);
