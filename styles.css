@@ -366,6 +366,83 @@ body {
   overflow: auto;
 }
 
+/* ---- Select tabs (Course / Venue toggle) ---- */
+.select-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.25rem;
+}
+
+.select-tab {
+  flex: 1;
+  padding: 0.55rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--radius) - 2px);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.select-tab:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.select-tab.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.select-panel[hidden] { display: none; }
+
+/* Venue card — same look as course-card but with sub-label layout */
+.venue-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 1rem 1.25rem;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+.venue-card:hover {
+  background: var(--surface);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateX(4px);
+}
+.venue-card:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+.venue-card-title {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.venue-card-sub {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
 /* ---- Course selection (step before timetable) ---- */
 .course-select {
   max-width: 560px;
@@ -1170,7 +1247,6 @@ body {
   display: block;
   aspect-ratio: 16 / 10;
   object-fit: cover;
-  vertical-align: middle;
 }
 .direction-step-trigger:hover img {
   opacity: 0.92;
@@ -1582,12 +1658,16 @@ body {
   .footer { padding: 0.5rem 1rem; }
   .footer p { font-size: 0.72rem; }
 
-  /* Course selection */
+  /* Course / venue selection */
   .course-select { padding: 1rem 0; }
   .course-select-title { font-size: 1.25rem; }
+  .select-tab { font-size: 0.88rem; padding: 0.5rem 0.75rem; }
   .course-search { padding: 0.65rem 0.85rem 0.65rem 2.25rem; font-size: 0.9rem; }
   .course-card { padding: 0.85rem 1rem; font-size: 0.9rem; }
   .course-card-desc { font-size: 0.8rem; }
+  .venue-card { padding: 0.85rem 1rem; font-size: 0.9rem; }
+  .venue-card-floor { font-size: 0.72rem; }
+  .venue-card-desc { font-size: 0.8rem; }
 }
 
 /* Mobile day filter: hide entire day-column divs when filtering */

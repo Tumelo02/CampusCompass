@@ -150,12 +150,21 @@
     return Math.max(1, Math.ceil(durationMins / MINS_PER_ROW));
   }
 
+  function normalizeRoom(room) {
+    // Strip a single leading zero only when the room number has 4+ digits starting with 0
+    // e.g. "0003" -> "003", "0222" -> "222", "001" -> "001" (already 3, unchanged)
+    while (room.length > 3 && room.charAt(0) === '0') {
+      room = room.slice(1);
+    }
+    return room;
+  }
+
   function parseRoom(str) {
     var first = (str || '').split(',')[0].trim();
     var parts = first.split('|');
     var bldg = (parts[0] || '').trim();
     var floor = parseInt(parts[1], 10);
-    var room = (parts[2] || '').trim();
+    var room = normalizeRoom((parts[2] || '').trim());
     if (isNaN(floor)) floor = 0;
     var venue = '';
     if (bldg) venue = 'Building ' + bldg;
@@ -384,7 +393,15 @@
   var courseSearchEl = document.getElementById('courseSearch');
   var courseListEmptyEl = document.getElementById('courseListEmpty');
   var courseEmptyState = document.getElementById('courseEmptyState');
+  var venueListEl = document.getElementById('venueList');
+  var venueSearchEl = document.getElementById('venueSearch');
+  var venueListEmptyEl = document.getElementById('venueListEmpty');
+  var tabCourseBtn = document.getElementById('tabCourse');
+  var tabVenueBtn = document.getElementById('tabVenue');
+  var panelCourse = document.getElementById('panelCourse');
+  var panelVenue = document.getElementById('panelVenue');
   var selectedCourseCode = null;
+  var activeSelectTab = 'course'; // 'course' | 'venue'
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -483,6 +500,111 @@
     });
   }
 
+  // ── Building name map ────────────────────────────────────────────────────────
+  var BUILDING_NAMES = {
+    '12': 'BHP Phase 1',
+    '13': 'ETB',
+    '14': 'BHP Phase 2',
+    '20': 'YARONA',
+    '76': 'Workshop Block'
+  };
+
+  var FLOOR_LABELS = { 0: 'Ground Floor', 1: 'First Floor', 2: 'Second Floor', 3: 'Third Floor' };
+
+  function floorLabel(f) {
+    return FLOOR_LABELS[f] !== undefined ? FLOOR_LABELS[f] : 'Floor ' + f;
+  }
+
+  // Extract all unique venues from bundle data
+  function getVenueList() {
+    var seen = {};
+    var list = [];
+    (appData.courses || []).forEach(function (course) {
+      (course.timetable || []).forEach(function (slot) {
+        if (!slot.venue || slot.buildingNumber === undefined) return;
+        var bldg = String(slot.buildingNumber || '').trim();
+        var floor = typeof slot.floor === 'number' ? slot.floor : 0;
+        var room = String(slot.roomNumber || slot.venue || '').trim();
+        if (!bldg || !room) return;
+        var key = bldg + '|' + floor + '|' + room;
+        if (!seen[key]) {
+          seen[key] = true;
+          list.push({ building: bldg, floor: floor, room: room, key: key });
+        }
+      });
+    });
+    list.sort(function (a, b) {
+      var ba = parseInt(a.building, 10), bb = parseInt(b.building, 10);
+      if (ba !== bb) return ba - bb;
+      if (a.floor !== b.floor) return a.floor - b.floor;
+      return a.room.localeCompare(b.room);
+    });
+    return list;
+  }
+
+  function buildVenueList() {
+    if (!venueListEl) return;
+    venueListEl.innerHTML = '';
+    var venues = getVenueList();
+
+    if (venues.length === 0) {
+      venueListEl.innerHTML = '<p class="course-list-empty">No venues available.</p>';
+      return;
+    }
+
+    venues.forEach(function (v) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'venue-card';
+      btn.dataset.venueKey = v.key;
+      btn.dataset.building = v.building;
+      btn.dataset.floor = v.floor;
+      btn.dataset.room = v.room;
+
+      var bldgName = BUILDING_NAMES[v.building] || 'Building ' + v.building;
+
+      // Title: "BHP Phase 2 — Ground Floor"
+      var titleSpan = document.createElement('span');
+      titleSpan.className = 'venue-card-title';
+      titleSpan.textContent = bldgName + ' — ' + floorLabel(v.floor);
+
+      // Subtitle: "Building 14 · Room 222"
+      var subSpan = document.createElement('span');
+      subSpan.className = 'venue-card-sub';
+      subSpan.textContent = 'Building ' + v.building + ' · Room ' + v.room;
+
+      btn.appendChild(titleSpan);
+      btn.appendChild(subSpan);
+      venueListEl.appendChild(btn);
+    });
+  }
+
+  function filterVenues() {
+    if (!venueListEl) return;
+    var q = (venueSearchEl && venueSearchEl.value) ? venueSearchEl.value.trim().toLowerCase() : '';
+    var cards = venueListEl.querySelectorAll('.venue-card');
+    var visible = 0;
+    cards.forEach(function (card) {
+      var text = (card.textContent || '').toLowerCase();
+      var key = (card.dataset.venueKey || '').toLowerCase();
+      var match = !q || text.indexOf(q) !== -1 || key.indexOf(q) !== -1;
+      card.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    if (venueListEmptyEl) venueListEmptyEl.style.display = visible ? 'none' : 'block';
+  }
+
+  // ── Tab switching ────────────────────────────────────────────────────────────
+  function switchSelectTab(tab) {
+    activeSelectTab = tab;
+    var isCourse = tab === 'course';
+    if (tabCourseBtn) { tabCourseBtn.classList.toggle('active', isCourse); tabCourseBtn.setAttribute('aria-selected', isCourse); }
+    if (tabVenueBtn) { tabVenueBtn.classList.toggle('active', !isCourse); tabVenueBtn.setAttribute('aria-selected', !isCourse); }
+    if (panelCourse) panelCourse.hidden = !isCourse;
+    if (panelVenue) panelVenue.hidden = isCourse;
+    if (!isCourse) buildVenueList();
+  }
+
   function filterCourses() {
     var q = (courseSearchEl && courseSearchEl.value) ? courseSearchEl.value.trim().toLowerCase() : '';
     var cards = courseListEl ? courseListEl.querySelectorAll('.course-card') : [];
@@ -507,6 +629,47 @@
     if (changeCourseBtn) changeCourseBtn.style.display = 'none';
     if (dayTabs) dayTabs.style.display = 'none';
     if (headerSubtitle) headerSubtitle.textContent = getSemesterLabel();
+    // Restore the tab that was active when user navigated away
+    switchSelectTab(activeSelectTab);
+  }
+
+  function showVenueTimetable(building, floor, room) {
+    selectedCourseCode = null;
+
+    // Build a synthetic timetable from all courses filtered to this venue
+    var floorNum = parseInt(floor, 10);
+    var slots = [];
+    (appData.courses || []).forEach(function (course) {
+      (course.timetable || []).forEach(function (slot) {
+        var slotBldg = String(slot.buildingNumber || '').trim();
+        var slotFloor = typeof slot.floor === 'number' ? slot.floor : 0;
+        var slotRoom = String(slot.roomNumber || '').trim();
+        if (slotBldg === building && slotFloor === floorNum && slotRoom === room) {
+          // Clone and tag with the course code as subject label
+          slots.push(Object.assign({}, slot, { subject: slot.subject || course.code }));
+        }
+      });
+    });
+
+    buildTimetableGrid(slots);
+
+    if (courseSelectSection) courseSelectSection.style.display = 'none';
+    if (timetableView) timetableView.style.display = '';
+    if (changeCourseBtn) { changeCourseBtn.textContent = 'Change venue'; changeCourseBtn.style.display = 'inline-block'; }
+    if (dayTabs) dayTabs.style.display = 'flex';
+
+    var bldgName = BUILDING_NAMES[building] || 'Building ' + building;
+    if (headerSubtitle) headerSubtitle.textContent = bldgName + ' · ' + floorLabel(floorNum) + ' · Room ' + room;
+
+    dayTabButtons.forEach(function (t) {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    var targetTab = document.querySelector('.day-tab[data-day="all"]');
+    if (targetTab) { targetTab.classList.add('active'); targetTab.setAttribute('aria-selected', 'true'); }
+    timetableEl.classList.remove('filter-mon', 'filter-tue', 'filter-wed', 'filter-thu', 'filter-fri');
+
+    refreshDisplayOptions();
   }
 
   function showTimetable(courseCode) {
@@ -521,7 +684,7 @@
 
     if (courseSelectSection) courseSelectSection.style.display = 'none';
     if (timetableView) timetableView.style.display = '';
-    if (changeCourseBtn) changeCourseBtn.style.display = 'inline-block';
+    if (changeCourseBtn) { changeCourseBtn.textContent = 'Change course'; changeCourseBtn.style.display = 'inline-block'; }
     if (dayTabs) dayTabs.style.display = 'flex';
     if (headerSubtitle) headerSubtitle.textContent = course.name ? course.name.trim() : courseCode;
 
@@ -1055,6 +1218,66 @@
     if (directionsClose) directionsClose.focus();
   }
 
+  // Open directions directly from a venue card (no lecturer card needed)
+  function openDirectionsForVenue(building, floor, room) {
+    var floorNum = parseInt(floor, 10);
+    var bldgName = BUILDING_NAMES[building] || 'Building ' + building;
+    var floorText = floorLabel(floorNum);
+
+    var imgs = [];
+    for (var i = 1; i <= 5; i++) {
+      if (i === 1 && CAMPUS_MAP_IMAGES[building]) {
+        imgs.push(CAMPUS_MAP_IMAGES[building]);
+      } else if (i === 2) {
+        imgs.push('Images/Building/' + building + '.jpg');
+      } else if (i === 3) {
+        imgs.push('Images/Building/' + building + '_' + floorNum + '.jpg');
+      } else if (i === 4) {
+        imgs.push('Images/Building/' + building + '_' + floorNum + '_' + room + '.jpg');
+      } else if (i === 5) {
+        imgs.push('Images/Building/' + building + '_' + floorNum + '_' + room + '_i.jpg');
+      } else {
+        imgs.push('');
+      }
+    }
+
+    var adminInstr = {};
+    try {
+      var rawInstr = localStorage.getItem('timetable_venue_instructions');
+      if (rawInstr) adminInstr = (JSON.parse(rawInstr)['default']) || {};
+    } catch (_) {}
+
+    var defaults = [
+      'Locate ' + bldgName + ' on campus.',
+      'This is the entrance to ' + bldgName + '.',
+      'Go to the ' + floorText + '.',
+      'Look for Room ' + room + '.',
+      'The venue should look like this.'
+    ];
+    currentStepInstructions = [];
+    for (var ii = 1; ii <= 5; ii++) {
+      currentStepInstructions.push(adminInstr[ii] || adminInstr['' + ii] || defaults[ii - 1]);
+    }
+
+    // Update directions title
+    var titleEl = document.getElementById('directionsTitle');
+    if (titleEl) titleEl.textContent = bldgName + ' — ' + floorText + ' · Room ' + room;
+
+    for (var j = 1; j <= 5; j++) {
+      var imgEl = document.getElementById('dirImg' + j);
+      var instEl = document.getElementById('dirInst' + j);
+      var triggerEl = document.getElementById('dirTrigger' + j);
+      if (imgEl) imgEl.src = imgs[j - 1];
+      if (instEl) { instEl.textContent = currentStepInstructions[j - 1] || ''; instEl.classList.remove('visible'); }
+      if (triggerEl) triggerEl.setAttribute('aria-expanded', 'false');
+    }
+
+    directionsOverlay.setAttribute('aria-hidden', 'false');
+    directionsOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (directionsClose) directionsClose.focus();
+  }
+
   function closeDirections() {
     directionsOverlay.setAttribute('aria-hidden', 'true');
     directionsOverlay.classList.remove('open');
@@ -1196,6 +1419,36 @@
       }
     });
   }
+
+  // ── Venue list events ──────────────────────────────────────────────────────
+
+  if (venueListEl) {
+    venueListEl.addEventListener('click', function (e) {
+      var card = e.target.closest('.venue-card');
+      if (card && card.dataset.venueKey && card.style.display !== 'none') {
+        openDirectionsForVenue(card.dataset.building, card.dataset.floor, card.dataset.room);
+      }
+    });
+  }
+
+  if (venueSearchEl) {
+    venueSearchEl.addEventListener('input', filterVenues);
+    venueSearchEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        venueSearchEl.value = '';
+        filterVenues();
+        venueSearchEl.blur();
+      }
+    });
+  }
+
+  // ── Select tab events ──────────────────────────────────────────────────────
+
+  if (tabCourseBtn) tabCourseBtn.addEventListener('click', function () { switchSelectTab('course'); });
+  if (tabVenueBtn) tabVenueBtn.addEventListener('click', function () { switchSelectTab('venue'); });
+
+  // Set initial tab state
+  switchSelectTab('course');
 
   if (changeCourseBtn) {
     changeCourseBtn.addEventListener('click', function () {

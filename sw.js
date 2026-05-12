@@ -1,5 +1,5 @@
 // Bump version to invalidate old caches when shipping shell changes.
-const VERSION = 'v1';
+const VERSION = 'v2';
 const STATIC_CACHE = 'campuscompass-static-' + VERSION;
 const RUNTIME_CACHE = 'campuscompass-runtime-' + VERSION;
 

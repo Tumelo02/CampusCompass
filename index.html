@@ -96,17 +96,38 @@
 
     <main class="main">
       <section class="course-select" id="courseSelect">
-        <h2 class="course-select-title">Select your course</h2>
-        <p class="course-select-hint">Choose a course to view its timetable</p>
-        <div class="course-search-wrap">
-          <input type="search" class="course-search" id="courseSearch" placeholder="Search by course code or name..." autocomplete="off" aria-label="Search courses" />
+        <h2 class="course-select-title">Select your choice</h2>
+
+        <div class="select-tabs" role="tablist" aria-label="Browse by">
+          <button type="button" class="select-tab active" id="tabCourse" role="tab" aria-selected="true" aria-controls="panelCourse">Course</button>
+          <button type="button" class="select-tab" id="tabVenue" role="tab" aria-selected="false" aria-controls="panelVenue">Venue</button>
         </div>
-        <div class="course-list-wrap">
-          <div class="course-list" id="courseList"></div>
-          <p class="course-list-empty" id="courseListEmpty" style="display: none;">No courses match your search.</p>
+
+        <!-- Course panel -->
+        <div class="select-panel" id="panelCourse" role="tabpanel" aria-labelledby="tabCourse">
+          <p class="course-select-hint">Choose a course to view its timetable</p>
+          <div class="course-search-wrap">
+            <input type="search" class="course-search" id="courseSearch" placeholder="Search by course code or name..." autocomplete="off" aria-label="Search courses" />
+          </div>
+          <div class="course-list-wrap">
+            <div class="course-list" id="courseList"></div>
+            <p class="course-list-empty" id="courseListEmpty" style="display: none;">No courses match your search.</p>
+          </div>
+          <div class="course-empty-state" id="courseEmptyState" style="display: none;">
+            <p>No courses yet. Please check back later.</p>
+          </div>
         </div>
-        <div class="course-empty-state" id="courseEmptyState" style="display: none;">
-          <p>No courses yet. Please check back later.</p>
+
+        <!-- Venue panel -->
+        <div class="select-panel" id="panelVenue" role="tabpanel" aria-labelledby="tabVenue" hidden>
+          <p class="course-select-hint">Choose a venue to see what's scheduled there</p>
+          <div class="course-search-wrap">
+            <input type="search" class="course-search" id="venueSearch" placeholder="Search by building or room number..." autocomplete="off" aria-label="Search venues" />
+          </div>
+          <div class="course-list-wrap">
+            <div class="course-list" id="venueList"></div>
+            <p class="course-list-empty" id="venueListEmpty" style="display: none;">No venues match your search.</p>
+          </div>
         </div>
       </section>
 

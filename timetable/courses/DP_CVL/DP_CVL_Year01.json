@@ -170,6 +170,19 @@
   },
   {
     "day": "Wednesday",
+    "time": "12:25 PM - 2:35 PM",
+    "course": "ALC5011|01|1",
+    "room": "12|0|0007",
+    "lecturer": "#DP_CVL|01|1, ALC5011|01|1|C|E6, HENNING W",
+    "week_start": "2026-04-20",
+    "group": "#DP_CVL|01|1",
+    "program": "DP_CVL",
+    "program_name": "Diploma in Civil Engineering",
+    "year": "01",
+    "semester": "01"
+  },
+  {
+    "day": "Wednesday",
     "time": "2:40 PM - 5:40 PM",
     "course": "MAT11A|01|1",
     "room": "14|1|159",
@@ -207,19 +220,7 @@
     "year": "01",
     "semester": "01"
   },
-  {
-    "day": "Thursday",
-    "time": "12:25 PM - 2:35 PM",
-    "course": "ALC5011|01|1",
-    "room": "12|0|0007",
-    "lecturer": "#DP_CVL|01|1, ALC5011|01|1|C|E6, HENNING W",
-    "week_start": "2026-04-20",
-    "group": "#DP_CVL|01|1",
-    "program": "DP_CVL",
-    "program_name": "Diploma in Civil Engineering",
-    "year": "01",
-    "semester": "01"
-  },
+
   {
     "day": "Thursday",
     "time": "1:55 PM - 3:20 PM",
@@ -277,7 +278,7 @@
     "time": "10:55 AM - 12:20 PM",
     "course": "ALC5011|01|1",
     "room": "12|0|0007",
-    "lecturer": "#DP_CVL|01|1",
+    "lecturer": "#DP_CVL|01|1, ALC5011|01|1|C|E6, HENNING W",
     "week_start": "2026-04-20",
     "group": "#DP_CVL|01|1",
     "program": "DP_CVL",
