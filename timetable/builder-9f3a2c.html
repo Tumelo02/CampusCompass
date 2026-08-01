@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Timetable Builder</title>
+<style>
+  :root {
+    --bg: #0f0f14;
+    --surface: #171720;
+    --surface-2: #1e1e2a;
+    --border: #2c2c3a;
+    --text: #e8e8f0;
+    --muted: #9a9aad;
+    --accent: #ff6b4a;
+    --accent-soft: rgba(255, 107, 74, 0.15);
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 1.5rem;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.5 "DM Sans", system-ui, -apple-system, Segoe UI, sans-serif;
+  }
+  h1 { margin: 0 0 0.25rem; font-size: 1.5rem; }
+  h2 { margin: 0 0 0.75rem; font-size: 1rem; letter-spacing: 0.02em; }
+  .sub { margin: 0 0 1.5rem; color: var(--muted); font-size: 0.9rem; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+  @media (max-width: 940px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem;
+    margin-bottom: 1.25rem;
+  }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; }
+  label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--muted); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  input, select {
+    width: 100%;
+    padding: 0.55rem 0.65rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.9rem;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  input::placeholder { color: #5c5c70; }
+  .field { margin-bottom: 0.75rem; }
+  .hint { margin: 0.3rem 0 0; font-size: 0.72rem; color: var(--muted); }
+  .hint code { color: var(--accent); background: var(--accent-soft); padding: 0.05rem 0.3rem; border-radius: 4px; }
+
+  button {
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.primary:hover { background: #ff8163; color: #fff; }
+  button.ghost { background: transparent; }
+  button.danger:hover { border-color: #f87171; color: #f87171; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+
+  .locked { border-color: var(--accent); }
+  .lock-note {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.78rem; color: var(--muted);
+    margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);
+  }
+  .pill { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); background: var(--accent-soft); padding: 0.15rem 0.5rem; border-radius: 999px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th, td { text-align: left; padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  td.mono, .mono { font-family: ui-monospace, Consolas, monospace; font-size: 0.78rem; }
+  tr.dupe td { background: rgba(251, 191, 36, 0.08); }
+  .empty { padding: 1.5rem; text-align: center; color: var(--muted); font-size: 0.85rem; }
+  .rowbtn { padding: 0.2rem 0.45rem; font-size: 0.72rem; font-weight: 500; }
+
+  pre {
+    margin: 0;
+    padding: 0.85rem;
+    background: #0b0b10;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 0.76rem;
+    line-height: 1.45;
+    max-height: 420px;
+    overflow: auto;
+    white-space: pre;
+  }
+  .filename { font-family: ui-monospace, Consolas, monospace; color: var(--accent); font-size: 0.85rem; }
+  .status { margin-left: auto; font-size: 0.78rem; color: var(--muted); }
+  .status.ok { color: var(--ok); }
+  .status.warn { color: var(--warn); }
+  .head-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+  .head-row h2 { margin: 0; }
+  .count { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+  .check {
+    display: flex; align-items: center; gap: 0.45rem;
+    margin-top: 0.75rem; font-size: 0.78rem; color: var(--muted);
+    text-transform: none; letter-spacing: 0; font-weight: 500; cursor: pointer;
+  }
+  .check input { width: auto; accent-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Timetable Builder</h1>
+  <p class="sub">Enter slots one at a time and export a timetable file in the exact format used under <span class="mono">timetable/courses/</span>.</p>
+
+  <div class="card" id="metaCard">
+    <div class="head-row">
+      <h2>Program details</h2>
+      <span class="pill" id="metaPill">Set once</span>
+      <span class="status" id="metaStatus"></span>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="program">Program code</label>
+        <input id="program" list="programList" placeholder="B_CON" autocomplete="off">
+        <datalist id="programList"></datalist>
+      </div>
+      <div class="field">
+        <label for="programName">Program name</label>
+        <input id="programName" placeholder="Bachelor of Construction" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="year">Year</label>
+        <select id="year">
+          <option value="">Select…</option>
+          <option value="01">01</option>
+          <option value="02">02</option>
+          <option value="03">03</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="semester">Semester</label>
+        <select id="semester">
+          <option value="">Select…</option>
+          <option value="01">01</option>
+          <option value="02">02</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="weekStart">Week start (default)</label>
+        <input id="weekStart" type="date">
+        <p class="hint">Written as <code>YYYY-MM-DD</code>. Can be overridden per slot.</p>
+      </div>
+      <div class="field">
+        <label for="group">Group (default)</label>
+        <input id="group" placeholder="#B_CON|01|1" autocomplete="off">
+        <p class="hint">Auto-filled as <code>#PROGRAM|YEAR|1</code> — edit if needed.</p>
+      </div>
+    </div>
+    <div class="lock-note">
+      <span>These four fields are written into every slot automatically.</span>
+      <button type="button" class="ghost" id="lockBtn">Lock</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <div class="head-row">
+          <h2>Add slot</h2>
+          <span class="status" id="slotStatus"></span>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="day">Day</label>
+            <select id="day">
+              <option>Monday</option>
+              <option>Tuesday</option>
+              <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+              <option>Saturday</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="time">Time</label>
+            <input id="time" list="timeList" placeholder="1:55 PM - 3:20 PM" autocomplete="off">
+            <datalist id="timeList"></datalist>
+          </div>
+        </div>
+        <div class="field">
+          <label for="course">Course</label>
+          <input id="course" placeholder="PIM5011|01|1" autocomplete="off">
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="room">Room</label>
+            <input id="room" placeholder="20|1|101" autocomplete="off">
+            <p class="hint">Leave blank if unknown — exports as <code>""</code>.</p>
+          </div>
+          <div class="field">
+            <label for="slotWeekStart">Week start</label>
+            <input id="slotWeekStart" type="date">
+          </div>
+        </div>
+        <div class="field">
+          <label for="lecturer">Lecturer</label>
+          <input id="lecturer" placeholder="#B_CON|01|1, PIM5011|01|1|C|E2" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="slotGroup">Group</label>
+          <input id="slotGroup" placeholder="#B_CON|01|1" autocomplete="off">
+        </div>
+        <div class="btn-row">
+          <button type="button" class="primary" id="addBtn">Add slot</button>
+          <button type="button" class="ghost" id="cancelEditBtn" hidden>Cancel edit</button>
+          <button type="button" class="ghost" id="clearFormBtn">Clear form</button>
+        </div>
+        <p class="hint">Tip: press <code>Enter</code> in any field to add the slot.</p>
+      </div>
+
+      <div class="card">
+        <div class="head-row">
+          <h2>Slots</h2>
+          <span class="count" id="slotCount">0 entries</span>
+          <span class="status" id="listStatus"></span>
+        </div>
+        <div id="tableWrap"><p class="empty">No slots yet.</p></div>
+        <div class="btn-row">
+          <button type="button" class="ghost" id="sortBtn">Sort by day &amp; time</button>
+          <button type="button" class="ghost danger" id="clearAllBtn">Clear all</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="head-row">
+          <h2>Output</h2>
+          <span class="filename" id="fileName">—</span>
+        </div>
+        <pre id="preview">[]</pre>
+        <div class="btn-row">
+          <button type="button" class="primary" id="downloadBtn">Download file</button>
+          <button type="button" class="ghost" id="copyBtn">Copy JSON</button>
+          <button type="button" class="ghost" id="importBtn">Import existing</button>
+          <input type="file" id="importFile" accept=".json,.js,application/json" hidden>
+        </div>
+        <label class="check"><input type="checkbox" id="crlf" checked> Windows line endings (CRLF) — matches the existing files</label>
+        <p class="hint">Save into <code>timetable/courses/&lt;PROGRAM&gt;/</code>, then add the year to <code>timetable/index.json</code> and rebuild the bundle.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORE_KEY = 'timetable_builder_draft_v1';
+  var DAY_ORDER = { Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
+
+  var KNOWN_PROGRAMS = [
+    ['B_ETE', 'Bachelor of Engineering Technology: Electrical Engineering'],
+    ['B_CON', 'Bachelor of Construction'],
+    ['B_CQS', 'Bachelor of Construction: Quantity Surveying'],
+    ['B_CVLE', 'Bachelor of Engineering Technology: Civil Engineering'],
+    ['B_INF', 'Bachelor of Information Technology'],
+    ['B_MEC', 'Bachelor of Engineering Technology: Mechanical Engineering'],
+    ['HC_CON', 'Higher Certificate: Construction'],
+    ['IEHCRE', 'Higher Certificate: Renewable Energy Technologies'],
+    ['DP_CVL', 'Diploma in Civil Engineering'],
+    ['DP_ELE', 'Diploma in Electrical Engineering'],
+    ['DP_IT', 'Diploma in Information Technology'],
+    ['DP_MEC', 'Diploma in Mechanical Engineering'],
+    ['ITEC', 'Information Technology']
+  ];
+
+  var COMMON_TIMES = [
+    '7:55 AM - 9:20 AM',
+    '9:25 AM - 10:50 AM',
+    '10:55 AM - 12:20 PM',
+    '12:25 PM - 1:50 PM',
+    '12:25 PM - 2:35 PM',
+    '1:55 PM - 3:20 PM',
+    '2:40 PM - 4:05 PM',
+    '3:25 PM - 4:50 PM'
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var slots = [];
+  var editIndex = -1;
+
+  // ---- meta fields (written into every slot) ----
+  var META = ['program', 'programName', 'year', 'semester', 'weekStart', 'group'];
+  var SLOT_INPUTS = ['day', 'time', 'course', 'room', 'lecturer', 'slotWeekStart', 'slotGroup'];
+
+  (function seedLists() {
+    var pl = $('programList');
+    KNOWN_PROGRAMS.forEach(function (p) {
+      var o = document.createElement('option');
+      o.value = p[0];
+      o.label = p[1];
+      pl.appendChild(o);
+    });
+    var tl = $('timeList');
+    COMMON_TIMES.forEach(function (t) {
+      var o = document.createElement('option');
+      o.value = t;
+      tl.appendChild(o);
+    });
+  })();
+
+  function pad2(v) {
+    v = String(v || '').trim();
+    if (!v) return '';
+    return /^\d$/.test(v) ? '0' + v : v;
+  }
+
+  // Year/semester are dropdowns with a fixed range. Imported or restored data
+  // could carry a value outside it (e.g. year "04"); add it so nothing is
+  // silently dropped on the way back out.
+  function setSelect(id, value) {
+    var el = $(id);
+    var v = pad2(value);
+    if (v && !Array.prototype.some.call(el.options, function (o) { return o.value === v; })) {
+      var o = document.createElement('option');
+      o.value = v;
+      o.textContent = v + ' (from file)';
+      el.appendChild(o);
+    }
+    el.value = v;
+  }
+
+  function meta() {
+    return {
+      program: $('program').value.trim(),
+      programName: $('programName').value.trim(),
+      year: pad2($('year').value),
+      semester: pad2($('semester').value),
+      weekStart: $('weekStart').value.trim(),
+      group: $('group').value.trim()
+    };
+  }
+
+  // ---- build one slot object with keys in the exact source order ----
+  function buildSlot(raw) {
+    var m = meta();
+    return {
+      day: raw.day,
+      time: raw.time,
+      course: raw.course,
+      room: raw.room,
+      lecturer: raw.lecturer,
+      week_start: raw.week_start || m.weekStart,
+      group: raw.group || m.group,
+      program: m.program,
+      program_name: m.programName,
+      year: m.year,
+      semester: m.semester
+    };
+  }
+
+  // Existing files under courses/ are 2-space indented, CRLF, with no trailing
+  // newline. Match that exactly so exports diff cleanly against the originals.
+  function outputJSON(forDisplay) {
+    var out = slots.map(buildSlot);
+    var text = JSON.stringify(out, null, 2);
+    if (forDisplay) return text;
+    return $('crlf').checked ? text.replace(/\n/g, '\r\n') : text;
+  }
+
+  function fileName() {
+    var m = meta();
+    if (!m.program || !m.year) return '';
+    return m.program + '_Year' + m.year + '.json';
+  }
+
+  // ---- duplicate detection: same day + time + course ----
+  function dupeKeys() {
+    var seen = {}, dupes = {};
+    slots.forEach(function (s) {
+      var k = s.day + '|' + s.time + '|' + s.course;
+      if (seen[k]) dupes[k] = true;
+      seen[k] = true;
+    });
+    return dupes;
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  function renderTable() {
+    var wrap = $('tableWrap');
+    $('slotCount').textContent = slots.length + (slots.length === 1 ? ' entry' : ' entries');
+    if (!slots.length) {
+      wrap.innerHTML = '<p class="empty">No slots yet.</p>';
+      return;
+    }
+    var dupes = dupeKeys();
+    var dupeCount = 0;
+    var rows = slots.map(function (s, i) {
+      var k = s.day + '|' + s.time + '|' + s.course;
+      var isDupe = !!dupes[k];
+      if (isDupe) dupeCount++;
+      return '<tr' + (isDupe ? ' class="dupe"' : '') + '>' +
+        '<td>' + esc(s.day) + '</td>' +
+        '<td class="mono">' + esc(s.time) + '</td>' +
+        '<td class="mono">' + esc(s.course) + '</td>' +
+        '<td class="mono">' + (s.room ? esc(s.room) : '<span style="color:#5c5c70">—</span>') + '</td>' +
+        '<td class="mono">' + esc(s.lecturer) + '</td>' +
+        '<td style="white-space:nowrap">' +
+          '<button type="button" class="rowbtn ghost" data-edit="' + i + '">Edit</button> ' +
+          '<button type="button" class="rowbtn ghost danger" data-del="' + i + '">Del</button>' +
+        '</td></tr>';
+    }).join('');
+    wrap.innerHTML =
+      '<div style="overflow-x:auto"><table><thead><tr>' +
+      '<th>Day</th><th>Time</th><th>Course</th><th>Room</th><th>Lecturer</th><th></th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+
+    var ls = $('listStatus');
+    if (dupeCount) {
+      ls.textContent = dupeCount + ' duplicate day/time/course';
+      ls.className = 'status warn';
+    } else {
+      ls.textContent = '';
+      ls.className = 'status';
+    }
+  }
+
+  function render() {
+    renderTable();
+    $('preview').textContent = outputJSON(true);
+    var fn = fileName();
+    $('fileName').textContent = fn || '— set program + year —';
+    var m = meta();
+    var missing = [];
+    if (!m.program) missing.push('program code');
+    if (!m.programName) missing.push('program name');
+    if (!m.year) missing.push('year');
+    if (!m.semester) missing.push('semester');
+    var ms = $('metaStatus');
+    if (missing.length) {
+      ms.textContent = 'Missing: ' + missing.join(', ');
+      ms.className = 'status warn';
+    } else {
+      ms.textContent = 'Applied to all ' + slots.length + ' slots';
+      ms.className = 'status ok';
+    }
+    save();
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ meta: meta(), slots: slots }));
+    } catch (e) {}
+  }
+
+  function restore() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return;
+      var d = JSON.parse(raw);
+      if (d && d.meta) {
+        $('program').value = d.meta.program || '';
+        $('programName').value = d.meta.programName || '';
+        setSelect('year', d.meta.year);
+        setSelect('semester', d.meta.semester);
+        $('weekStart').value = d.meta.weekStart || '';
+        $('group').value = d.meta.group || '';
+      }
+      if (d && Array.isArray(d.slots)) slots = d.slots;
+    } catch (e) {}
+  }
+
+  // ---- auto-fill program name + group from program code ----
+  $('program').addEventListener('input', function () {
+    var code = this.value.trim().toUpperCase();
+    this.value = code;
+    var match = KNOWN_PROGRAMS.filter(function (p) { return p[0] === code; })[0];
+    if (match && !$('programName').value.trim()) $('programName').value = match[1];
+    autoGroup();
+    render();
+  });
+  $('year').addEventListener('change', function () { autoGroup(); render(); });
+
+  function autoGroup() {
+    var code = $('program').value.trim();
+    var yr = pad2($('year').value);
+    if (!code || !yr) return;
+    var suggested = '#' + code + '|' + yr + '|1';
+    var g = $('group');
+    // only overwrite while the user has not hand-edited it
+    if (!g.value.trim() || /^#[A-Z_]+\|\d{2}\|\d+$/.test(g.value.trim())) g.value = suggested;
+  }
+
+  META.forEach(function (id) {
+    var el = $(id);
+    // selects report changes via 'change'; text/date inputs via 'input'
+    el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', render);
+  });
+
+  $('lockBtn').addEventListener('click', function () {
+    var locked = this.textContent === 'Unlock';
+    META.forEach(function (id) {
+      var el = $(id);
+      // readOnly is a no-op on <select>, so disable those instead
+      if (el.tagName === 'SELECT') el.disabled = !locked;
+      else el.readOnly = !locked;
+    });
+    $('metaCard').classList.toggle('locked', !locked);
+    this.textContent = locked ? 'Lock' : 'Unlock';
+  });
+
+  // ---- add / edit ----
+  function readForm() {
+    return {
+      day: $('day').value,
+      time: $('time').value.trim(),
+      course: $('course').value.trim(),
+      room: $('room').value.trim(),
+      lecturer: $('lecturer').value.trim(),
+      week_start: $('slotWeekStart').value.trim(),
+      group: $('slotGroup').value.trim()
+    };
+  }
+
+  function clearSlotForm() {
+    ['time', 'course', 'room', 'lecturer'].forEach(function (id) { $(id).value = ''; });
+    $('slotWeekStart').value = '';
+    $('slotGroup').value = '';
+    editIndex = -1;
+    $('addBtn').textContent = 'Add slot';
+    $('cancelEditBtn').hidden = true;
+  }
+
+  function flash(msg, cls) {
+    var el = $('slotStatus');
+    el.textContent = msg;
+    el.className = 'status ' + (cls || '');
+    clearTimeout(flash.t);
+    flash.t = setTimeout(function () { el.textContent = ''; el.className = 'status'; }, 2500);
+  }
+
+  function addSlot() {
+    var m = meta();
+    if (!m.program || !m.programName || !m.year || !m.semester) {
+      flash('Fill in the program details first', 'warn');
+      return;
+    }
+    var raw = readForm();
+    if (!raw.time) { flash('Time is required', 'warn'); $('time').focus(); return; }
+    if (!raw.course) { flash('Course is required', 'warn'); $('course').focus(); return; }
+
+    if (editIndex >= 0) {
+      slots[editIndex] = raw;
+      flash('Slot updated', 'ok');
+    } else {
+      slots.push(raw);
+      flash('Slot added', 'ok');
+    }
+    clearSlotForm();
+    render();
+    $('time').focus();
+  }
+
+  $('addBtn').addEventListener('click', addSlot);
+  $('clearFormBtn').addEventListener('click', function () { clearSlotForm(); render(); });
+  $('cancelEditBtn').addEventListener('click', function () { clearSlotForm(); render(); });
+
+  SLOT_INPUTS.forEach(function (id) {
+    $(id).addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); addSlot(); }
+    });
+  });
+
+  $('tableWrap').addEventListener('click', function (e) {
+    var t = e.target;
+    if (t.dataset.del != null) {
+      var di = Number(t.dataset.del);
+      slots.splice(di, 1);
+      if (editIndex === di) clearSlotForm();
+      else if (editIndex > di) editIndex--;
+      render();
+    } else if (t.dataset.edit != null) {
+      var i = Number(t.dataset.edit);
+      var s = slots[i];
+      $('day').value = s.day;
+      $('time').value = s.time;
+      $('course').value = s.course;
+      $('room').value = s.room;
+      $('lecturer').value = s.lecturer;
+      $('slotWeekStart').value = s.week_start || '';
+      $('slotGroup').value = s.group || '';
+      editIndex = i;
+      $('addBtn').textContent = 'Save changes';
+      $('cancelEditBtn').hidden = false;
+      $('time').focus();
+    }
+  });
+
+  // ---- sort by day, then start time ----
+  function timeMinutes(t) {
+    var m = /^\s*(\d{1,2}):(\d{2})\s*(AM|PM)/i.exec(t || '');
+    if (!m) return 9999;
+    var h = Number(m[1]) % 12;
+    if (/pm/i.test(m[3])) h += 12;
+    return h * 60 + Number(m[2]);
+  }
+
+  $('sortBtn').addEventListener('click', function () {
+    slots.sort(function (a, b) {
+      var d = (DAY_ORDER[a.day] || 9) - (DAY_ORDER[b.day] || 9);
+      if (d) return d;
+      return timeMinutes(a.time) - timeMinutes(b.time);
+    });
+    clearSlotForm();
+    render();
+  });
+
+  $('clearAllBtn').addEventListener('click', function () {
+    if (!slots.length) return;
+    if (!confirm('Remove all ' + slots.length + ' slots? This cannot be undone.')) return;
+    slots = [];
+    clearSlotForm();
+    render();
+  });
+
+  // ---- export ----
+  $('downloadBtn').addEventListener('click', function () {
+    var fn = fileName();
+    if (!fn) { flash('Set program code and year first', 'warn'); return; }
+    if (!slots.length) { flash('Nothing to export', 'warn'); return; }
+    var blob = new Blob([outputJSON()], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = fn;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  });
+
+  $('copyBtn').addEventListener('click', function () {
+    var self = this;
+    navigator.clipboard.writeText(outputJSON(true)).then(function () {
+      self.textContent = 'Copied!';
+      setTimeout(function () { self.textContent = 'Copy JSON'; }, 1500);
+    }, function () {
+      self.textContent = 'Copy failed';
+      setTimeout(function () { self.textContent = 'Copy JSON'; }, 1500);
+    });
+  });
+
+  // ---- import an existing file to keep editing it ----
+  $('importBtn').addEventListener('click', function () { $('importFile').click(); });
+  $('importFile').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var text = String(reader.result || '').trim();
+      // tolerate a JS file that wraps the array in an assignment / export
+      var start = text.indexOf('[');
+      var end = text.lastIndexOf(']');
+      if (start > 0 || end < text.length - 1) {
+        if (start >= 0 && end > start) text = text.slice(start, end + 1);
+      }
+      var data;
+      try { data = JSON.parse(text); } catch (err) {
+        flash('Could not parse that file', 'warn');
+        return;
+      }
+      if (!Array.isArray(data) || !data.length) { flash('No entries found', 'warn'); return; }
+
+      var first = data[0];
+      $('program').value = first.program || '';
+      $('programName').value = first.program_name || '';
+      setSelect('year', first.year);
+      setSelect('semester', first.semester);
+      $('weekStart').value = first.week_start || '';
+      $('group').value = first.group || '';
+
+      slots = data.map(function (s) {
+        return {
+          day: s.day || '',
+          time: s.time || '',
+          course: s.course || '',
+          room: s.room || '',
+          lecturer: s.lecturer || '',
+          week_start: s.week_start || '',
+          group: s.group || ''
+        };
+      });
+      clearSlotForm();
+      render();
+      flash('Imported ' + slots.length + ' entries', 'ok');
+    };
+    reader.readAsText(f);
+    e.target.value = '';
+  });
+
+  restore();
+  render();
+})();
+</script>
+</body>
+</html>

@@ -30,6 +30,110 @@
     });
   })();
 
+  // Share menu — native share sheet on mobile, social links elsewhere
+  (function setupShareMenu() {
+    var btn = document.getElementById('shareBtn');
+    var menu = document.getElementById('shareMenu');
+    if (!btn || !menu) return;
+
+    var SHARE_TITLE = 'Campus Compass';
+    var SHARE_TEXT = 'Campus Compass — your CUT class timetable, lecturer info, and campus directions in one place.';
+
+    function shareUrl() {
+      return window.location.origin + window.location.pathname;
+    }
+
+    function buildLinks() {
+      var url = encodeURIComponent(shareUrl());
+      var text = encodeURIComponent(SHARE_TEXT);
+      var title = encodeURIComponent(SHARE_TITLE);
+      var targets = {
+        whatsapp: 'https://api.whatsapp.com/send?text=' + text + '%20' + url,
+        x: 'https://twitter.com/intent/tweet?text=' + text + '&url=' + url,
+        facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + url,
+        telegram: 'https://t.me/share/url?url=' + url + '&text=' + text,
+        linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + url + '&title=' + title
+      };
+      Object.keys(targets).forEach(function (key) {
+        var link = menu.querySelector('[data-share="' + key + '"]');
+        if (link) link.setAttribute('href', targets[key]);
+      });
+    }
+
+    function setOpen(open) {
+      if (open) {
+        buildLinks();
+        var profileMenu = document.getElementById('profileMenu');
+        var profileBtn = document.getElementById('profileBtn');
+        if (profileMenu && profileMenu.classList.contains('open')) {
+          profileMenu.classList.remove('open');
+          profileMenu.setAttribute('aria-hidden', 'true');
+          if (profileBtn) {
+            profileBtn.classList.remove('open');
+            profileBtn.setAttribute('aria-expanded', 'false');
+          }
+        }
+      }
+      btn.classList.toggle('open', open);
+      menu.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      menu.setAttribute('aria-hidden', open ? 'false' : 'true');
+    }
+
+    function nativeShare() {
+      if (!navigator.share) return false;
+      try {
+        navigator.share({ title: SHARE_TITLE, text: SHARE_TEXT, url: shareUrl() }).catch(function () {});
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      // Phones/tablets get the OS share sheet, which already lists every installed app
+      var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+      if (coarse && !menu.classList.contains('open') && nativeShare()) return;
+      setOpen(!menu.classList.contains('open'));
+    });
+
+    var copyBtn = menu.querySelector('[data-share="copy"]');
+    if (copyBtn) {
+      var copyLabel = copyBtn.querySelector('.share-copy-label');
+      var copyTimer = null;
+      copyBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var url = shareUrl();
+        function done(ok) {
+          if (copyLabel) copyLabel.textContent = ok ? 'Link copied!' : 'Press Ctrl+C to copy';
+          copyBtn.classList.toggle('copied', ok);
+          clearTimeout(copyTimer);
+          copyTimer = setTimeout(function () {
+            if (copyLabel) copyLabel.textContent = 'Copy link';
+            copyBtn.classList.remove('copied');
+          }, 2000);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(function () { done(true); }, function () { done(false); });
+        } else {
+          done(false);
+        }
+      });
+    }
+
+    menu.addEventListener('click', function (e) {
+      if (e.target.closest('a.share-option')) setOpen(false);
+    });
+    document.addEventListener('click', function (e) {
+      if (!menu.classList.contains('open')) return;
+      if (!menu.contains(e.target) && e.target !== btn) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && menu.classList.contains('open')) setOpen(false);
+    });
+  })();
+
   // Profile menu (UI only — login wiring lives in a future update)
   (function setupProfileMenu() {
     var btn = document.getElementById('profileBtn');
@@ -37,6 +141,18 @@
     if (!btn || !menu) return;
 
     function setOpen(open) {
+      if (open) {
+        var shareMenu = document.getElementById('shareMenu');
+        var shareBtn = document.getElementById('shareBtn');
+        if (shareMenu && shareMenu.classList.contains('open')) {
+          shareMenu.classList.remove('open');
+          shareMenu.setAttribute('aria-hidden', 'true');
+          if (shareBtn) {
+            shareBtn.classList.remove('open');
+            shareBtn.setAttribute('aria-expanded', 'false');
+          }
+        }
+      }
       btn.classList.toggle('open', open);
       menu.classList.toggle('open', open);
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');

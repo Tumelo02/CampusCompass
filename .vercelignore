@@ -1,0 +1,25 @@
+# Keeps the deployment to just the web app. Everything here is local-only
+# tooling or documentation — none of it is fetched by the browser.
+
+# Python scraper + data-maintenance scripts
+timetable/*.py
+timetable/requirements.txt
+__pycache__/
+
+# Scraper debug artifacts
+timetable/debug-*.log
+timetable/table_debug.html
+
+# Docs
+README.md
+data-format.md
+IMAGE_PATHS_REFERENCE.md
+IMAGE_PATH_UPDATE.md
+timetable/README.md
+timetable/BUILDER_README.md
+timetable/ZERO_ENTRIES_ANALYSIS.md
+
+# NOTE: do NOT ignore Images/ — app.js requests those paths directly at runtime
+# (building exteriors and CUT_MAP), so excluding it breaks the venue photos.
+
+.DS_Store

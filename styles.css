@@ -89,7 +89,7 @@ body {
   z-index: 10;
 }
 
-/* ---- Header action cluster (theme + profile) ---- */
+/* ---- Header action cluster (share + profile) ---- */
 .header-actions {
   position: absolute;
   top: 1rem;
@@ -173,6 +173,84 @@ body {
 /* Light mode: show sun, hide moon */
 [data-theme="light"] .theme-toggle .theme-icon-sun  { opacity: 1; transform: rotate(0)      scale(1); }
 [data-theme="light"] .theme-toggle .theme-icon-moon { opacity: 0; transform: rotate(90deg) scale(0.4); }
+
+/* ---- Share button & dropdown ---- */
+.share-wrap { position: relative; }
+
+.share-btn svg { width: 18px; height: 18px; }
+.share-btn.open { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+
+.share-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 200px;
+  padding: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 20;
+}
+.share-menu.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.share-menu-title {
+  margin: 0.15rem 0 0.5rem;
+  padding: 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.share-option {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.share-option:hover,
+.share-option:focus-visible {
+  outline: none;
+  background: var(--surface-elevated);
+  color: var(--accent);
+}
+.share-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+}
+.share-option:hover .share-icon,
+.share-option:focus-visible .share-icon { color: var(--accent); }
+.share-icon svg { width: 16px; height: 16px; }
+
+.share-copy { margin-top: 0.15rem; border-top: 1px solid var(--border); border-radius: 0 0 var(--radius-sm) var(--radius-sm); padding-top: 0.6rem; }
+.share-copy.copied,
+.share-copy.copied .share-icon { color: var(--accent); }
 
 /* ---- Profile button & dropdown ---- */
 .profile-wrap { position: relative; }
@@ -276,7 +354,7 @@ body {
 .header-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding-right: 3.5rem; /* reserve space for theme toggle */
+  padding-right: 6rem; /* reserve space for share + profile buttons */
 }
 
 .logo {
