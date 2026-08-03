@@ -1736,11 +1736,38 @@
     refreshNextClassBanner();
   }
 
-  // Periodic refresh
-  setInterval(refreshLiveUI, 60 * 1000);
-  window.addEventListener('resize', updateNowIndicator);
+  // Periodic refresh. The clock only matters while the tab is actually being
+  // looked at, so the timer is stopped whenever the page is hidden and a fresh
+  // refresh runs on the way back — no wasted wakeups in background tabs.
+  var liveTimer = null;
+
+  function startLiveTimer() {
+    if (liveTimer === null) liveTimer = setInterval(refreshLiveUI, 60 * 1000);
+  }
+
+  function stopLiveTimer() {
+    if (liveTimer !== null) {
+      clearInterval(liveTimer);
+      liveTimer = null;
+    }
+  }
+
+  startLiveTimer();
+
+  // Debounced so a drag-resize does not recompute the indicator on every frame.
+  var resizeTimer = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(updateNowIndicator, 150);
+  });
+
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) refreshLiveUI();
+    if (document.hidden) {
+      stopLiveTimer();
+    } else {
+      refreshLiveUI();
+      startLiveTimer();
+    }
   });
   dayTabButtons.forEach(function (tab) {
     tab.addEventListener('click', function () {

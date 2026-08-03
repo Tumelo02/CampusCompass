@@ -1779,3 +1779,18 @@ body {
   .header { padding: 0.65rem 0.75rem; }
   .main { padding: 0.5rem; }
 }
+
+/* ---- Reduced motion / energy saving ----
+   Honours the OS "reduce motion" setting. Cutting transitions and smooth
+   scrolling avoids continuous compositor work, which measurably lowers CPU/GPU
+   wakeups and battery draw on laptops and phones. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
