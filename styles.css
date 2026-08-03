@@ -1333,6 +1333,9 @@ body {
   aspect-ratio: 16 / 10;
   object-fit: cover;
 }
+/* `display: block` above would otherwise defeat the [hidden] attribute set on
+   steps whose photo is missing. */
+.direction-step-trigger img[hidden] { display: none; }
 .direction-step-trigger:hover img {
   opacity: 0.92;
 }
