@@ -30,6 +30,172 @@
     });
   })();
 
+  // Minimal QR encoder: byte mode, error-correction level L, versions 1-6.
+  // Enough for URLs up to 134 chars, which covers any deployment domain.
+  function qrEncode(text) {
+    var EC_L = 1;
+    // [version] = { size, capacity(bytes,L), ecWords, blocks, align }
+    var VERSIONS = [
+      null,
+      { cap: 17,  ec: 7,  blocks: 1, align: [] },
+      { cap: 32,  ec: 10, blocks: 1, align: [6, 18] },
+      { cap: 53,  ec: 15, blocks: 1, align: [6, 22] },
+      { cap: 78,  ec: 20, blocks: 1, align: [6, 26] },
+      { cap: 106, ec: 26, blocks: 1, align: [6, 30] },
+      // v6+ needs multi-block interleaving; not implemented (see cap check)
+    ];
+
+    var bytes = [];
+    for (var i = 0; i < text.length; i++) {
+      var c = text.charCodeAt(i);
+      if (c < 0x80) bytes.push(c);
+      else if (c < 0x800) { bytes.push(0xC0 | (c >> 6), 0x80 | (c & 0x3F)); }
+      else { bytes.push(0xE0 | (c >> 12), 0x80 | ((c >> 6) & 0x3F), 0x80 | (c & 0x3F)); }
+    }
+
+    var ver = 0;
+    for (var v = 1; v <= 5; v++) { if (bytes.length <= VERSIONS[v].cap) { ver = v; break; } }
+    if (!ver) return null;
+    var info = VERSIONS[ver];
+    var size = 17 + ver * 4;
+
+    // ---- bit stream ----
+    var bits = [];
+    function put(val, len) { for (var b = len - 1; b >= 0; b--) bits.push((val >> b) & 1); }
+    put(4, 4);                       // byte mode
+    put(bytes.length, ver < 10 ? 8 : 16);
+    for (i = 0; i < bytes.length; i++) put(bytes[i], 8);
+
+    var totalWords = info.cap + (ver === 6 ? 0 : 0);
+    // data codewords total = capacity rounded per spec
+    var dataWords = info.cap;
+    var capBits = dataWords * 8;
+    for (i = 0; i < 4 && bits.length < capBits; i++) bits.push(0);   // terminator
+    while (bits.length % 8) bits.push(0);
+    var pad = [0xEC, 0x11], p = 0;
+    while (bits.length < capBits) { put(pad[p++ % 2], 8); }
+
+    var data = [];
+    for (i = 0; i < bits.length; i += 8) {
+      var byte = 0;
+      for (var j = 0; j < 8; j++) byte = (byte << 1) | bits[i + j];
+      data.push(byte);
+    }
+
+    // ---- Reed-Solomon ----
+    var EXP = new Array(512), LOG = new Array(256);
+    var x = 1;
+    for (i = 0; i < 255; i++) { EXP[i] = x; LOG[x] = i; x <<= 1; if (x & 0x100) x ^= 0x11D; }
+    for (i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+    function mul(a, b) { return (a === 0 || b === 0) ? 0 : EXP[LOG[a] + LOG[b]]; }
+
+    function rsGen(n) {
+      var poly = [1];
+      for (var i = 0; i < n; i++) {
+        var np = new Array(poly.length + 1).fill(0);
+        for (var j = 0; j < poly.length; j++) {
+          np[j] ^= poly[j];
+          np[j + 1] ^= mul(poly[j], EXP[i]);
+        }
+        poly = np;
+      }
+      return poly;
+    }
+    function rsEncode(dataBlock, ecLen) {
+      var gen = rsGen(ecLen);
+      var res = new Array(ecLen).fill(0);
+      for (var i = 0; i < dataBlock.length; i++) {
+        var factor = dataBlock[i] ^ res[0];
+        res.shift(); res.push(0);
+        for (var j = 0; j < ecLen; j++) res[j] ^= mul(gen[j + 1], factor);
+      }
+      return res;
+    }
+
+    var ecc = rsEncode(data, info.ec);
+    var all = data.concat(ecc);
+
+    // ---- matrix ----
+    var m = [], reserved = [];
+    for (i = 0; i < size; i++) { m.push(new Array(size).fill(0)); reserved.push(new Array(size).fill(0)); }
+
+    function setF(r, c, v) { m[r][c] = v; reserved[r][c] = 1; }
+
+    function finder(r, c) {
+      for (var dr = -1; dr <= 7; dr++) for (var dc = -1; dc <= 7; dc++) {
+        var rr = r + dr, cc = c + dc;
+        if (rr < 0 || cc < 0 || rr >= size || cc >= size) continue;
+        var on = (dr >= 0 && dr <= 6 && (dc === 0 || dc === 6)) ||
+                 (dc >= 0 && dc <= 6 && (dr === 0 || dr === 6)) ||
+                 (dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4);
+        setF(rr, cc, on ? 1 : 0);
+      }
+    }
+    finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+
+    for (i = 8; i < size - 8; i++) {
+      setF(6, i, i % 2 === 0 ? 1 : 0);
+      setF(i, 6, i % 2 === 0 ? 1 : 0);
+    }
+
+    var al = info.align;
+    if (al.length) {
+      for (var a = 0; a < al.length; a++) for (var b = 0; b < al.length; b++) {
+        var ar = al[a], ac = al[b];
+        if ((ar <= 7 && ac <= 7) || (ar <= 7 && ac >= size - 8) || (ar >= size - 8 && ac <= 7)) continue;
+        for (var dr2 = -2; dr2 <= 2; dr2++) for (var dc2 = -2; dc2 <= 2; dc2++) {
+          var on2 = Math.max(Math.abs(dr2), Math.abs(dc2)) !== 1;
+          setF(ar + dr2, ac + dc2, on2 ? 1 : 0);
+        }
+      }
+    }
+
+    setF(size - 8, 8, 1); // dark module
+
+    // reserve format areas
+    for (i = 0; i < 9; i++) { if (!reserved[8][i]) setF(8, i, 0); if (!reserved[i][8]) setF(i, 8, 0); }
+    for (i = 0; i < 8; i++) { if (!reserved[8][size-1-i]) setF(8, size-1-i, 0); if (!reserved[size-1-i][8]) setF(size-1-i, 8, 0); }
+
+    // ---- place data zigzag ----
+    var bitIdx = 0, dirUp = true;
+    var allBits = [];
+    for (i = 0; i < all.length; i++) for (j = 7; j >= 0; j--) allBits.push((all[i] >> j) & 1);
+
+    for (var col = size - 1; col > 0; col -= 2) {
+      if (col === 6) col--;
+      for (var rowi = 0; rowi < size; rowi++) {
+        var row = dirUp ? size - 1 - rowi : rowi;
+        for (var k = 0; k < 2; k++) {
+          var cc2 = col - k;
+          if (reserved[row][cc2]) continue;
+          m[row][cc2] = bitIdx < allBits.length ? allBits[bitIdx] : 0;
+          bitIdx++;
+        }
+      }
+      dirUp = !dirUp;
+    }
+
+    // ---- mask 0 + format info ----
+    for (var r = 0; r < size; r++) for (var c = 0; c < size; c++) {
+      if (!reserved[r][c] && ((r + c) % 2 === 0)) m[r][c] ^= 1;
+    }
+
+    var fmt = (EC_L << 3) | 0; // ec level L (01) << 3 | mask 0
+    var fbits = fmt << 10;
+    var g = 0x537;
+    for (i = 14; i >= 10; i--) if ((fbits >> i) & 1) fbits ^= g << (i - 10);
+    var format = ((fmt << 10) | fbits) ^ 0x5412;
+
+    for (i = 0; i <= 5; i++) m[8][i] = (format >> (14 - i)) & 1;
+    m[8][7] = (format >> 8) & 1; m[8][8] = (format >> 7) & 1; m[7][8] = (format >> 6) & 1;
+    for (i = 9; i <= 14; i++) m[14 - i][8] = (format >> (14 - i)) & 1;
+    for (i = 0; i <= 7; i++) m[size - 1 - i][8] = (format >> i) & 1;
+    for (i = 8; i <= 14; i++) m[8][size - 15 + i] = (format >> i) & 1;
+    m[size - 8][8] = 1;
+
+    return m;
+  }
+
   // Share menu — native share sheet on mobile, social links elsewhere
   (function setupShareMenu() {
     var btn = document.getElementById('shareBtn');
@@ -41,6 +207,17 @@
 
     function shareUrl() {
       return window.location.origin + window.location.pathname;
+    }
+
+    function copyLink(url, done) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(
+          function () { done(true); },
+          function () { done(false); }
+        );
+      } else {
+        done(false);
+      }
     }
 
     function buildLinks() {
@@ -90,12 +267,150 @@
       }
     }
 
+    // ---- QR overlay ----
+    var qrOverlay = document.getElementById('qrOverlay');
+    var qrCodeEl = document.getElementById('qrCode');
+    var qrUrlEl = document.getElementById('qrUrl');
+    var qrLastFocus = null;
+
+    function renderQr(url) {
+      if (!qrCodeEl) return false;
+      var matrix = qrEncode(url);
+      if (!matrix) return false;
+      var n = matrix.length;
+      var quiet = 4;                 // spec-mandated quiet zone
+      var span = n + quiet * 2;
+      // One <rect> per dark module. An inline SVG keeps this crisp at any size
+      // and needs no canvas, no external library, and no network request.
+      var parts = [
+        '<svg viewBox="0 0 ' + span + ' ' + span + '" role="img" aria-label="QR code linking to Campus Compass" xmlns="http://www.w3.org/2000/svg">',
+        '<rect width="' + span + '" height="' + span + '" fill="#fff"/>'
+      ];
+      for (var r = 0; r < n; r++) {
+        for (var c = 0; c < n; c++) {
+          if (matrix[r][c]) {
+            parts.push('<rect x="' + (c + quiet) + '" y="' + (r + quiet) + '" width="1" height="1" fill="#000"/>');
+          }
+        }
+      }
+      parts.push('</svg>');
+      qrCodeEl.innerHTML = parts.join('');
+      return true;
+    }
+
+    function openQr() {
+      if (!qrOverlay) return;
+      var url = shareUrl();
+      if (!renderQr(url)) {
+        // Only happens for very long URLs; fall back rather than show a broken box.
+        flashShare('Link too long for a QR code');
+        return;
+      }
+      if (qrUrlEl) qrUrlEl.textContent = url;
+      qrLastFocus = document.activeElement;
+      qrOverlay.classList.add('open');
+      qrOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      var close = document.getElementById('qrClose');
+      if (close) close.focus();
+    }
+
+    function closeQr() {
+      if (!qrOverlay) return;
+      qrOverlay.classList.remove('open');
+      qrOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (qrLastFocus && qrLastFocus.focus) qrLastFocus.focus();
+      qrLastFocus = null;
+    }
+
+    function flashShare(msg) {
+      // Lightweight inline notice; the choice sheet is the only surface that
+      // needs it, so reuse its title rather than adding a toast system.
+      var t = document.getElementById('shareChoiceTitle');
+      if (!t) return;
+      var prev = t.textContent;
+      t.textContent = msg;
+      setTimeout(function () { t.textContent = prev; }, 2200);
+    }
+
+    if (qrOverlay) {
+      var qrBackdrop = document.getElementById('qrBackdrop');
+      var qrCloseBtn = document.getElementById('qrClose');
+      if (qrBackdrop) qrBackdrop.addEventListener('click', closeQr);
+      if (qrCloseBtn) qrCloseBtn.addEventListener('click', closeQr);
+      var qrCopyBtn = document.getElementById('qrCopy');
+      if (qrCopyBtn) {
+        qrCopyBtn.addEventListener('click', function () {
+          var self = this;
+          copyLink(shareUrl(), function (ok) {
+            self.textContent = ok ? 'Link copied!' : 'Copy failed';
+            setTimeout(function () { self.textContent = 'Copy link'; }, 1800);
+          });
+        });
+      }
+    }
+
+    // ---- choice sheet (mobile): link vs QR ----
+    var choice = document.getElementById('shareChoice');
+    var choiceLastFocus = null;
+
+    function openChoice() {
+      if (!choice) return;
+      choiceLastFocus = document.activeElement;
+      choice.classList.add('open');
+      choice.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      var first = document.getElementById('shareChoiceLink');
+      if (first) first.focus();
+    }
+
+    function closeChoice() {
+      if (!choice) return;
+      choice.classList.remove('open');
+      choice.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (choiceLastFocus && choiceLastFocus.focus) choiceLastFocus.focus();
+      choiceLastFocus = null;
+    }
+
+    if (choice) {
+      var cLink = document.getElementById('shareChoiceLink');
+      var cQr = document.getElementById('shareChoiceQr');
+      var cCancel = document.getElementById('shareChoiceCancel');
+      var cBackdrop = document.getElementById('shareChoiceBackdrop');
+
+      if (cLink) cLink.addEventListener('click', function () {
+        closeChoice();
+        // Native sheet where available, otherwise the desktop dropdown.
+        if (!nativeShare()) setOpen(true);
+      });
+      if (cQr) cQr.addEventListener('click', function () {
+        closeChoice();
+        openQr();
+      });
+      if (cCancel) cCancel.addEventListener('click', closeChoice);
+      if (cBackdrop) cBackdrop.addEventListener('click', closeChoice);
+    }
+
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
-      // Phones/tablets get the OS share sheet, which already lists every installed app
+      // Touch devices are asked to pick first: sending a link, or showing a QR
+      // for someone to scan in person. Desktop keeps the dropdown, where a QR
+      // is far less useful than copy/paste.
       var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-      if (coarse && !menu.classList.contains('open') && nativeShare()) return;
+      if (coarse && choice) {
+        if (menu.classList.contains('open')) setOpen(false);
+        openChoice();
+        return;
+      }
       setOpen(!menu.classList.contains('open'));
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      if (qrOverlay && qrOverlay.classList.contains('open')) closeQr();
+      else if (choice && choice.classList.contains('open')) closeChoice();
     });
 
     var copyBtn = menu.querySelector('[data-share="copy"]');
@@ -104,8 +419,7 @@
       var copyTimer = null;
       copyBtn.addEventListener('click', function (e) {
         e.stopPropagation();
-        var url = shareUrl();
-        function done(ok) {
+        copyLink(shareUrl(), function (ok) {
           if (copyLabel) copyLabel.textContent = ok ? 'Link copied!' : 'Press Ctrl+C to copy';
           copyBtn.classList.toggle('copied', ok);
           clearTimeout(copyTimer);
@@ -113,12 +427,7 @@
             if (copyLabel) copyLabel.textContent = 'Copy link';
             copyBtn.classList.remove('copied');
           }, 2000);
-        }
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(url).then(function () { done(true); }, function () { done(false); });
-        } else {
-          done(false);
-        }
+        });
       });
     }
 

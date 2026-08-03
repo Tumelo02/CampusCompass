@@ -228,6 +228,53 @@
     </footer>
   </div>
 
+  <div class="qr-overlay" id="qrOverlay" aria-hidden="true">
+    <div class="qr-backdrop" id="qrBackdrop"></div>
+    <div class="qr-card" role="dialog" aria-modal="true" aria-labelledby="qrCardTitle">
+      <button type="button" class="qr-close" id="qrClose" aria-label="Close">&times;</button>
+      <h2 class="qr-title" id="qrCardTitle">Scan to open</h2>
+      <p class="qr-sub">Point a phone camera at the code</p>
+      <div class="qr-code" id="qrCode"></div>
+      <p class="qr-url" id="qrUrl"></p>
+      <button type="button" class="qr-copy" id="qrCopy">Copy link</button>
+    </div>
+  </div>
+
+  <div class="share-choice" id="shareChoice" aria-hidden="true">
+    <div class="share-choice-backdrop" id="shareChoiceBackdrop"></div>
+    <div class="share-choice-sheet" role="dialog" aria-modal="true" aria-labelledby="shareChoiceTitle">
+      <div class="share-choice-grip" aria-hidden="true"></div>
+      <h2 class="share-choice-title" id="shareChoiceTitle">Share Campus Compass</h2>
+      <button type="button" class="share-choice-btn" id="shareChoiceLink">
+        <span class="share-choice-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+        </span>
+        <span class="share-choice-text">
+          <span class="share-choice-label">Share link</span>
+          <span class="share-choice-hint">Send via WhatsApp, messages, or email</span>
+        </span>
+      </button>
+      <button type="button" class="share-choice-btn" id="shareChoiceQr">
+        <span class="share-choice-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <path d="M14 14h3v3h-3zM18 18h3v3h-3z"/>
+          </svg>
+        </span>
+        <span class="share-choice-text">
+          <span class="share-choice-label">Show QR code</span>
+          <span class="share-choice-hint">Let someone scan it in person</span>
+        </span>
+      </button>
+      <button type="button" class="share-choice-cancel" id="shareChoiceCancel">Cancel</button>
+    </div>
+  </div>
+
   <div class="lecturer-overlay" id="lecturerOverlay" aria-hidden="true">
     <div class="lecturer-backdrop" id="lecturerBackdrop"></div>
     <div class="lecturer-card" id="lecturerCard" role="dialog" aria-labelledby="lecturerCardTitle">

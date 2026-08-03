@@ -1797,3 +1797,215 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---- Share choice sheet (touch devices) ---- */
+.share-choice {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.share-choice.open { opacity: 1; visibility: visible; }
+
+.share-choice-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.share-choice-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--surface);
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  padding: 0.75rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%);
+  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  max-width: 520px;
+  margin: 0 auto;
+}
+.share-choice.open .share-choice-sheet { transform: translateY(0); }
+
+.share-choice-grip {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+  margin: 0.15rem auto 0.85rem;
+}
+
+.share-choice-title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text);
+}
+
+.share-choice-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-elevated);
+  color: var(--text);
+  font-family: var(--font-body);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.share-choice-btn:active { border-color: var(--accent); }
+
+.share-choice-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+}
+.share-choice-icon svg { width: 20px; height: 20px; }
+
+.share-choice-text { min-width: 0; }
+.share-choice-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.share-choice-hint {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.1rem;
+}
+
+.share-choice-cancel {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.8rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ---- QR overlay ---- */
+.qr-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.qr-overlay.open { opacity: 1; visibility: visible; }
+
+.qr-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.qr-card {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  padding: 1.5rem 1.25rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  text-align: center;
+  transform: scale(0.96);
+  transition: transform 0.2s ease;
+}
+.qr-overlay.open .qr-card { transform: scale(1); }
+
+.qr-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.65rem;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.qr-close:hover { color: var(--text); }
+
+.qr-title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.qr-sub {
+  margin: 0.25rem 0 1rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* White plate keeps the code scannable in dark mode — scanners need the
+   light/dark contrast of the spec, not the app's theme colours. */
+.qr-code {
+  width: 100%;
+  max-width: 240px;
+  margin: 0 auto;
+  padding: 10px;
+  background: #fff;
+  border-radius: 12px;
+}
+.qr-code svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* keep module edges hard rather than blurred when scaled */
+  image-rendering: pixelated;
+  shape-rendering: crispEdges;
+}
+
+.qr-url {
+  margin: 0.9rem 0 0.85rem;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.qr-copy {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.qr-copy:hover { border-color: var(--accent); color: var(--accent); }
