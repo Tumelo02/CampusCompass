@@ -101,12 +101,20 @@
     },
     {
       "code": "B_MEC",
-      "name": "Diploma in Mechanical Engineering",
+      "name": "Bachelor of Engineering Technology: Mechanical Engineering",
       "folder": "courses/B_MEC",
       "years": [
         {
           "year": "01",
           "timetable": "courses/B_MEC/B_MEC_Year01.json"
+        },
+        {
+          "year": "02",
+          "timetable": "courses/B_MEC/B_MEC_Year02.json"
+        },
+        {
+          "year": "03",
+          "timetable": "courses/B_MEC/B_MEC_Year03.json"
         }
       ]
     },
