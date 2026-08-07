@@ -1,0 +1,28 @@
+[
+  {
+    "day": "Friday",
+    "time": "10:55 AM - 12:20 PM",
+    "course": "LCS5012|01|2",
+    "room": "14|0|024",
+    "lecturer": "",
+    "week_start": "2026-07-20",
+    "group": "#DP_ITC C|01|1",
+    "program": "DP_ITC",
+    "program_name": "Diploma in Information Technology",
+    "year": "01",
+    "semester": "02"
+  },
+  {
+    "day": "Friday",
+    "time": "3:25 PM - 4:50 PM",
+    "course": "SOD125C|01|2",
+    "room": "12|2|0225",
+    "lecturer": "",
+    "week_start": "2026-07-20",
+    "group": "#DP_ITC C|01|1",
+    "program": "DP_ITC",
+    "program_name": "Diploma in Information Technology",
+    "year": "01",
+    "semester": "02"
+  }
+]

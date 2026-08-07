@@ -3,142 +3,213 @@
   "facultyFolder": "courses",
   "programs": [
     {
-      "code": "B_ETE",
-      "name": "Bachelor of Engineering Technology: Electrical Engineering",
-      "folder": "courses/B_ETE",
-      "lecturers": "courses/B_ETE/B_ETE_Lecturers.json",
+      "code": "AD_CMN",
+      "name": "Advanced Diploma in Computer Networking",
+      "folder": "courses/AD_CMN",
       "years": [
-        { "year": "01", "timetable": "courses/B_ETE/B_ETE_Year01.json" },
-        { "year": "02", "timetable": "courses/B_ETE/B_ETE_Year02.json" },
-        { "year": "03", "timetable": "courses/B_ETE/B_ETE_Year03.json" }
+        {
+          "year": "01",
+          "timetable": "courses/AD_CMN/AD_CMN_Year01.json"
+        }
       ]
     },
     {
-      "code": "HC_CON",
-      "name": "Higher Certificate: Construction",
-      "folder": "courses/HC_CON",
-      "lecturers": "courses/HC_CON/HC_CON_Lecturers.json",
+      "code": "AD_ITC",
+      "name": "Advanced Diploma in Information Technology",
+      "folder": "courses/AD_ITC",
       "years": [
-        { "year": "01", "timetable": "courses/HC_CON/HC_CON_Year01.json" }
+        {
+          "year": "01",
+          "timetable": "courses/AD_ITC/AD_ITC_Year01.json"
+        }
       ]
     },
     {
-      "code": "IEHCRE",
-      "name": "Higher Certificate: Renewable Energy Technologies",
-      "folder": "courses/IEHCRE",
-      "lecturers": "courses/IEHCRE/IEHCRE_Lecturers.json",
+      "code": "B_CHSM",
+      "name": "Bachelor : Health and Safety Management",
+      "folder": "courses/B_CHSM",
       "years": [
-        { "year": "01", "timetable": "courses/IEHCRE/IEHCRE_Year01.json" }
+        {
+          "year": "02",
+          "timetable": "courses/B_CHSM/B_CHSM_Year02.json"
+        },
+        {
+          "year": "03",
+          "timetable": "courses/B_CHSM/B_CHSM_Year03.json"
+        }
       ]
     },
     {
       "code": "B_CON",
-      "name": "Bachelor of Engineering Technology: Construction",
+      "name": "Bachelor of Construction",
       "folder": "courses/B_CON",
-      "lecturers": "courses/B_CON/B_CON_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "courses/B_CON/B_CON_Year01.json" },
-        { "year": "02", "timetable": "courses/B_CON/B_CON_Year02.json" },
-        { "year": "03", "timetable": "courses/B_CON/B_CON_Year03.json" }
-      ]
+        {
+          "year": "01",
+          "timetable": "courses/B_CON/B_CON_Year01.json"
+        },
+        {
+          "year": "02",
+          "timetable": "courses/B_CON/B_CON_Year02.json"
+        },
+        {
+          "year": "03",
+          "timetable": "courses/B_CON/B_CON_Year03.json"
+        }
+      ],
+      "lecturers": "courses/B_CON/B_CON_Lecturers.json"
     },
     {
       "code": "B_CQS",
       "name": "Bachelor of Construction: Quantity Surveying",
       "folder": "courses/B_CQS",
-      "lecturers": "courses/B_CQS/B_CQS_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "courses/B_CQS/B_CQS_Year01.json" },
-        { "year": "02", "timetable": "courses/B_CQS/B_CQS_Year02.json" },
-        { "year": "03", "timetable": "courses/B_CQS/B_CQS_Year03.json" }
-      ]
+        {
+          "year": "01",
+          "timetable": "courses/B_CQS/B_CQS_Year01.json"
+        },
+        {
+          "year": "02",
+          "timetable": "courses/B_CQS/B_CQS_Year02.json"
+        },
+        {
+          "year": "03",
+          "timetable": "courses/B_CQS/B_CQS_Year03.json"
+        }
+      ],
+      "lecturers": "courses/B_CQS/B_CQS_Lecturers.json"
     },
     {
       "code": "B_CVLE",
-      "name": "Bachelor of Engineering Technology: Civil Engineering",
+      "name": "Bachelor : Civil Engineering",
       "folder": "courses/B_CVLE",
-      "lecturers": "courses/B_CVLE/B_CVLE_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "courses/B_CVLE/B_CVLE_Year01.json" },
-        { "year": "02", "timetable": "courses/B_CVLE/B_CVLE_Year02.json" },
-        { "year": "03", "timetable": "courses/B_CVLE/B_CVLE_Year03.json" }
-      ]
-    },
-    {
-      "code": "B_INF",
-      "name": "Bachelor of Information Technology",
-      "folder": "courses/B_INF",
-      "lecturers": "courses/B_INF/B_INF_Lecturers.json",
-      "years": [
-        { "year": "01", "timetable": "courses/B_INF/B_INF_Year01.json" },
-        { "year": "02", "timetable": "courses/B_INF/B_INF_Year02.json" },
-        { "year": "03", "timetable": "courses/B_INF/B_INF_Year03.json" }
-      ]
+        {
+          "year": "01",
+          "timetable": "courses/B_CVLE/B_CVLE_Year01.json"
+        },
+        {
+          "year": "02",
+          "timetable": "courses/B_CVLE/B_CVLE_Year02.json"
+        },
+        {
+          "year": "03",
+          "timetable": "courses/B_CVLE/B_CVLE_Year03.json"
+        }
+      ],
+      "lecturers": "courses/B_CVLE/B_CVLE_Lecturers.json"
     },
     {
       "code": "B_MEC",
-      "name": "Bachelor of Engineering Technology: Mechanical Engineering",
+      "name": "Diploma in Mechanical Engineering",
       "folder": "courses/B_MEC",
-      "lecturers": "courses/B_MEC/B_MEC_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "courses/B_MEC/B_MEC_Year01.json" },
-        { "year": "02", "timetable": "courses/B_MEC/B_MEC_Year02.json" },
-        { "year": "03", "timetable": "courses/B_MEC/B_MEC_Year03.json" }
+        {
+          "year": "01",
+          "timetable": "courses/B_MEC/B_MEC_Year01.json"
+        }
+      ]
+    },
+    {
+      "code": "DP_CMN",
+      "name": "Diploma in Computer Networking",
+      "folder": "courses/DP_CMN",
+      "years": [
+        {
+          "year": "01",
+          "timetable": "courses/DP_CMN/DP_CMN_Year01.json"
+        },
+        {
+          "year": "02",
+          "timetable": "courses/DP_CMN/DP_CMN_Year02.json"
+        },
+        {
+          "year": "03",
+          "timetable": "courses/DP_CMN/DP_CMN_Year03.json"
+        }
       ]
     },
     {
       "code": "DP_CVL",
       "name": "Diploma in Civil Engineering",
       "folder": "courses/DP_CVL",
-      "lecturers": "courses/DP_CVL/DP_CVL_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "courses/DP_CVL/DP_CVL_Year01.json" },
-        { "year": "02", "timetable": "courses/DP_CVL/DP_CVL_Year02.json" },
-        { "year": "03", "timetable": "courses/DP_CVL/DP_CVL_Year03.json" }
-      ]
+        {
+          "year": "01",
+          "timetable": "courses/DP_CVL/DP_CVL_Year01.json"
+        },
+        {
+          "year": "02",
+          "timetable": "courses/DP_CVL/DP_CVL_Year02.json"
+        }
+      ],
+      "lecturers": "courses/DP_CVL/DP_CVL_Lecturers.json"
     },
     {
-      "code": "DP_ELE",
-      "name": "Diploma in Electrical Engineering",
-      "folder": "courses/DP_ELE",
-      "lecturers": "courses/DP_ELE/DP_ELE_Lecturers.json",
-      "years": [
-        { "year": "01", "timetable": "courses/DP_ELE/DP_ELE_Year01.json" },
-        { "year": "02", "timetable": "courses/DP_ELE/DP_ELE_Year02.json" },
-        { "year": "03", "timetable": "courses/DP_ELE/DP_ELE_Year03.json" }
-      ]
-    },
-    {
-      "code": "DP_IT",
+      "code": "DP_ITC",
       "name": "Diploma in Information Technology",
-      "folder": "courses/DP_IT",
-      "lecturers": "courses/DP_IT/DP_IT_Lecturers.json",
+      "folder": "courses/DP_ITC",
       "years": [
-        { "year": "01", "timetable": "courses/DP_IT/DP_IT_Year01.json" },
-        { "year": "02", "timetable": "courses/DP_IT/DP_IT_Year02.json" },
-        { "year": "03", "timetable": "courses/DP_IT/DP_IT_Year03.json" }
+        {
+          "year": "03",
+          "timetable": "courses/DP_ITC/DP_ITC_Year03.json"
+        }
+      ]
+    },
+    {
+      "code": "DP_ITC A",
+      "name": "Diploma in Information Technology (Group A)",
+      "folder": "courses/DP_ITC_A",
+      "years": [
+        {
+          "year": "01",
+          "timetable": "courses/DP_ITC_A/DP_ITC_A_Year01.json"
+        },
+        {
+          "year": "02",
+          "timetable": "courses/DP_ITC_A/DP_ITC_A_Year02.json"
+        }
+      ]
+    },
+    {
+      "code": "DP_ITC B",
+      "name": "Diploma in Information Technology (Group B)",
+      "folder": "courses/DP_ITC_B",
+      "years": [
+        {
+          "year": "01",
+          "timetable": "courses/DP_ITC_B/DP_ITC_B_Year01.json"
+        },
+        {
+          "year": "02",
+          "timetable": "courses/DP_ITC_B/DP_ITC_B_Year02.json"
+        }
+      ]
+    },
+    {
+      "code": "DP_ITC C",
+      "name": "Diploma in Information Technology (Group C)",
+      "folder": "courses/DP_ITC_C",
+      "years": [
+        {
+          "year": "01",
+          "timetable": "courses/DP_ITC_C/DP_ITC_C_Year01.json"
+        }
       ]
     },
     {
       "code": "DP_MEC",
       "name": "Diploma in Mechanical Engineering",
       "folder": "courses/DP_MEC",
-      "lecturers": "courses/DP_MEC/DP_MEC_Lecturers.json",
       "years": [
-        { "year": "01", "timetable": "courses/DP_MEC/DP_MEC_Year01.json" },
-        { "year": "02", "timetable": "courses/DP_MEC/DP_MEC_Year02.json" },
-        { "year": "03", "timetable": "courses/DP_MEC/DP_MEC_Year03.json" }
-      ]
-    },
-    {
-      "code": "ITEC",
-      "name": "Information Technology",
-      "folder": "courses/ITEC",
-      "lecturers": "courses/ITEC/ITEC_Lecturers.json",
-      "years": [
-        { "year": "01", "timetable": "courses/ITEC/ITEC_Year01.json" },
-        { "year": "02", "timetable": "courses/ITEC/ITEC_Year02.json" },
-        { "year": "03", "timetable": "courses/ITEC/ITEC_Year03.json" }
+        {
+          "year": "01",
+          "timetable": "courses/DP_MEC/DP_MEC_Year01.json"
+        },
+        {
+          "year": "02",
+          "timetable": "courses/DP_MEC/DP_MEC_Year02.json"
+        }
       ]
     }
   ]

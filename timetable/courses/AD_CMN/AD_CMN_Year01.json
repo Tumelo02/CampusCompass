@@ -1,0 +1,41 @@
+[
+  {
+    "day": "Monday",
+    "time": "5:00 PM - 21:25 PM",
+    "course": "IFD427C|01|2",
+    "room": "12|2|0226",
+    "lecturer": "",
+    "week_start": "2026-07-20",
+    "group": "#AD_CMN|01|1",
+    "program": "AD_CMN",
+    "program_name": "Advanced Diploma in Computer Networking",
+    "year": "01",
+    "semester": "02"
+  },
+  {
+    "day": "Tuesday",
+    "time": "5:00 PM - 21:25 PM",
+    "course": "OPS427E|01|2",
+    "room": "12|2|0225",
+    "lecturer": "",
+    "week_start": "2026-07-20",
+    "group": "#AD_CMN|01|1",
+    "program": "AD_CMN",
+    "program_name": "Advanced Diploma in Computer Networking",
+    "year": "01",
+    "semester": "02"
+  },
+  {
+    "day": "Wednesday",
+    "time": "5:00 PM - 21:25 PM",
+    "course": "NPJ427C|01|2",
+    "room": "12|2|0226",
+    "lecturer": "",
+    "week_start": "2026-07-20",
+    "group": "#AD_CMN|01|1",
+    "program": "AD_CMN",
+    "program_name": "Advanced Diploma in Computer Networking",
+    "year": "01",
+    "semester": "02"
+  }
+]

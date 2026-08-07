@@ -1,0 +1,67 @@
+[
+  {
+    "day": "Monday",
+    "time": "5:45 PM - 9:25 PM",
+    "course": "SOE427C|01|2",
+    "room": "12|2|0200",
+    "lecturer": "",
+    "week_start": "2026-07-20",
+    "group": "#AD_ITC|01|1",
+    "program": "AD_ITC",
+    "program_name": "Advanced Diploma in Information Technology",
+    "year": "01",
+    "semester": "02"
+  },
+  {
+    "day": "Tuesday",
+    "time": "5:00 PM - 21:25 PM",
+    "course": "12|2|0200",
+    "room": "12|2|0200",
+    "lecturer": "",
+    "week_start": "2026-07-20",
+    "group": "#AD_ITC|01|1",
+    "program": "AD_ITC",
+    "program_name": "Advanced Diploma in Information Technology",
+    "year": "01",
+    "semester": "02"
+  },
+  {
+    "day": "Wednesday",
+    "time": "5:00 PM - 9:25 PM",
+    "course": "CSA427E|01|2",
+    "room": "12|2|0200",
+    "lecturer": "",
+    "week_start": "2026-07-20",
+    "group": "#AD_ITC|01|1",
+    "program": "AD_ITC",
+    "program_name": "Advanced Diploma in Information Technology",
+    "year": "01",
+    "semester": "02"
+  },
+  {
+    "day": "Thursday",
+    "time": "5:00 PM - 9:25 PM",
+    "course": "IPJ427C|01|2",
+    "room": "12|2|0200",
+    "lecturer": "",
+    "week_start": "2026-07-20",
+    "group": "#AD_ITC|01|1",
+    "program": "AD_ITC",
+    "program_name": "Advanced Diploma in Information Technology",
+    "year": "01",
+    "semester": "02"
+  },
+  {
+    "day": "Friday",
+    "time": "5:00 PM - 6:25 PM",
+    "course": "IPJ527C|01|2",
+    "room": "12|2|0200",
+    "lecturer": "",
+    "week_start": "2026-07-20",
+    "group": "#AD_ITC|01|1",
+    "program": "AD_ITC",
+    "program_name": "Advanced Diploma in Information Technology",
+    "year": "01",
+    "semester": "02"
+  }
+]
