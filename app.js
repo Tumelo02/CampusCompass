@@ -501,7 +501,10 @@
           return (o.semester === 1 ? '1st' : '2nd') + ' Semester ' + o.year;
       }
     } catch (e) {}
-    return '1st Semester 2026';
+    // Fallback for visitors with nothing stored — i.e. every student, since
+    // the admin Semester & year setting is per-browser and never published.
+    // Keep this in step with the timetable data under timetable/courses/.
+    return '2nd Semester 2026';
   }
 
   // Placeholder images - empty strings for faster loading (no external requests)

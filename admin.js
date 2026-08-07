@@ -40,7 +40,7 @@
         if (o && (o.semester === 1 || o.semester === 2) && o.year) return o;
       }
     } catch (e) {}
-    return { semester: 1, year: 2026 };
+    return { semester: 2, year: 2026 };
   }
 
   function setSemesterYear(o) {
