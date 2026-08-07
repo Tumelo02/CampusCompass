@@ -274,7 +274,10 @@
     //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('YourNewPassword'))
     //     .then(b => console.log(Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join('')))
     // then paste the resulting hex string below.
-    var ADMIN_PASS_HASH = 'd645cfd318c93a02d24fd2932d844c43bb0e251a65502a51370177b9177065bb';
+    // SHA-256 of the admin passcode. This gates the page UI only; saving
+    // changes is authorised separately by ADMIN_PASS_HASH on the server, so
+    // keep the two in sync when either is rotated.
+    var ADMIN_PASS_HASH = '58a0d2d144a24b2104f868a053daa4b57ccb7f28905fbf693f5cc0aa553cfc56';
 
     function sha256Hex(str) {
       var enc = new TextEncoder().encode(str);
