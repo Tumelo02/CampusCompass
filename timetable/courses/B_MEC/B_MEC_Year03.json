@@ -1,7 +1,7 @@
 [
   {
     "day": "Monday",
-    "time": "08:40-10:05",
+    "time": "08:40 AM - 10:05 AM",
     "course": "MDP30A|01|0",
     "room": "13|0|004",
     "lecturer": "",
@@ -14,7 +14,7 @@
   },
   {
     "day": "Monday",
-    "time": "10:10-11:35",
+    "time": "10:10 AM - 11:35 AM",
     "course": "MHM32A|01|2",
     "room": "14|1|138",
     "lecturer": "",
@@ -27,9 +27,9 @@
   },
   {
     "day": "Monday",
-    "time": "13:10-15:20",
+    "time": "13:10 PM - 15:20 PM",
     "course": "MSA32A|01|2",
-    "room": "12|1|0141",
+    "room": "12|1|141",
     "lecturer": "",
     "week_start": "2026-07-21",
     "group": "#B_MEC|03|1",
@@ -40,7 +40,7 @@
   },
   {
     "day": "Tuesday",
-    "time": "09:25-10:50",
+    "time": "09:25 AM - 10:50 AM",
     "course": "MSA32A|01|2",
     "room": "14|0|021",
     "lecturer": "",
@@ -66,7 +66,7 @@
   },
   {
     "day": "Tuesday",
-    "time": "13:10-14:35",
+    "time": "13:10 PM - 14:35 PM",
     "course": "MHM32A|01|2",
     "room": "14|0|023",
     "lecturer": "",
@@ -79,7 +79,7 @@
   },
   {
     "day": "Wednesday",
-    "time": "09:25-10:50",
+    "time": "09:25 AM - 10:50 AM",
     "course": "MDP30A|01|0",
     "room": "13|0|004",
     "lecturer": "",
@@ -92,7 +92,7 @@
   },
   {
     "day": "Wednesday",
-    "time": "10:55-13:05",
+    "time": "10:55 AM - 13:05 PM",
     "course": "MHM32A|01|2",
     "room": "12|1|0137",
     "lecturer": "",
@@ -105,7 +105,7 @@
   },
   {
     "day": "Thursday",
-    "time": "07:55-10:05",
+    "time": "07:55 AM - 10:05 AM",
     "course": "MDP30A|01|0",
     "room": "12|1|0100",
     "lecturer": "",
@@ -118,7 +118,7 @@
   },
   {
     "day": "Thursday",
-    "time": "10:10-11:35",
+    "time": "10:10 AM - 11:35 AM",
     "course": "MRF32A|01|2",
     "room": "14|0|023",
     "lecturer": "",
@@ -131,7 +131,7 @@
   },
   {
     "day": "Thursday",
-    "time": "11:40-13:05",
+    "time": "11:40 AM - 13:05 PM",
     "course": "MSA32A|01|2",
     "room": "14|0|025",
     "lecturer": "",
@@ -144,7 +144,7 @@
   },
   {
     "day": "Thursday",
-    "time": "13:10-15:20",
+    "time": "13:10 PM - 15:20 PM",
     "course": "MRF32A|01|2",
     "room": "12|1|0139",
     "lecturer": "",
@@ -157,7 +157,7 @@
   },
   {
     "day": "Thursday",
-    "time": "13:10-14:35",
+    "time": "13:10 PM - 14:35 PM",
     "course": "MRF32A|01|2",
     "room": "13|1|110",
     "lecturer": "",
@@ -183,7 +183,7 @@
   },
   {
     "day": "Friday",
-    "time": "13:10-15:20",
+    "time": "13:10 PM - 15:20 PM",
     "course": "MCS32A|01|2",
     "room": "13|1|103",
     "lecturer": "",

@@ -62,11 +62,37 @@ def main() -> int:
 
         programs_out.append(prog_out)
 
+    # Derive the semester/year from the timetable entries themselves so the
+    # header label follows the data instead of a hardcoded string. The admin
+    # Semester & year panel only writes to localStorage, so it never reaches
+    # students — this is what they actually see.
+    semesters, years = set(), set()
+    for prog in programs_out:
+        for y in prog.get("years", []):
+            for entry in y.get("timetable", []):
+                sem = str(entry.get("semester", "")).lstrip("0")
+                if sem:
+                    semesters.add(sem)
+                ws = str(entry.get("week_start", ""))
+                if len(ws) >= 4 and ws[:4].isdigit():
+                    years.add(ws[:4])
+
     bundle = {
         "facultyName": idx.get("facultyName"),
         "facultyFolder": idx.get("facultyFolder"),
         "programs": programs_out,
     }
+
+    # Only publish a label when the data agrees on one semester and one year;
+    # a mixed set means the app should fall back rather than pick arbitrarily.
+    if len(semesters) == 1 and len(years) == 1:
+        sem = semesters.pop()
+        bundle["semester"] = int(sem)
+        bundle["year"] = int(years.pop())
+        print(f"[ok] semester label: {bundle['semester']} / {bundle['year']}")
+    else:
+        print(f"[warn] mixed semester/year in data (sem={sorted(semesters)}, "
+              f"years={sorted(years)}); no label published", file=sys.stderr)
 
     with OUT.open("w", encoding="utf-8") as f:
         json.dump(bundle, f, ensure_ascii=False, separators=(",", ":"))

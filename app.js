@@ -492,18 +492,28 @@
   var VISIBILITY_API_URL = '/api/visibility';
   var liveDisabledCodes = null;
 
+  // Set from bundle.json, which derives it from the timetable entries. This is
+  // what students see; the localStorage key below is a per-device admin
+  // override that never leaves the browser that set it.
+  var publishedSemester = null;
+
+  function formatSemester(semester, year) {
+    return (semester === 1 ? '1st' : '2nd') + ' Semester ' + year;
+  }
+
   function getSemesterLabel() {
     try {
       var raw = localStorage.getItem(SEMESTER_YEAR_KEY);
       if (raw) {
         var o = JSON.parse(raw);
         if (o && (o.semester === 1 || o.semester === 2) && o.year)
-          return (o.semester === 1 ? '1st' : '2nd') + ' Semester ' + o.year;
+          return formatSemester(o.semester, o.year);
       }
     } catch (e) {}
-    // Fallback for visitors with nothing stored — i.e. every student, since
-    // the admin Semester & year setting is per-browser and never published.
-    // Keep this in step with the timetable data under timetable/courses/.
+    if (publishedSemester) {
+      return formatSemester(publishedSemester.semester, publishedSemester.year);
+    }
+    // Last resort: only reached if the bundle predates the published label.
     return '2nd Semester 2026';
   }
 
@@ -660,6 +670,10 @@
   }
 
   function bundleToAppData(bundle) {
+    // Published by build_bundle.py from the timetable data itself.
+    if ((bundle.semester === 1 || bundle.semester === 2) && bundle.year) {
+      publishedSemester = { semester: bundle.semester, year: bundle.year };
+    }
     var overrides = getAdminOverrides();
     var bundleDisabled = {};
     var disabledSource = Array.isArray(liveDisabledCodes)

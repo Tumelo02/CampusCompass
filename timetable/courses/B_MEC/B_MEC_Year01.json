@@ -14,22 +14,9 @@
   },
   {
     "day": "Monday",
-    "time": "09:25-10:50",
+    "time": "09:25 AM - 10:50 AM",
     "course": "MEC12A|01|2",
     "room": "13|1|103",
-    "lecturer": "",
-    "week_start": "2026-07-21",
-    "group": "#B_MEC|01|1",
-    "program": "B_MEC",
-    "program_name": "BECHELORS lN MECHANICAL Engineering",
-    "year": "01",
-    "semester": "02"
-  },
-  {
-    "day": "Monday",
-    "time": "09:25-10:50",
-    "course": "MEC12A|01|2",
-    "room": "13|1|105",
     "lecturer": "",
     "week_start": "2026-07-21",
     "group": "#B_MEC|01|1",
@@ -53,7 +40,7 @@
   },
   {
     "day": "Monday",
-    "time": "12:25-13:50",
+    "time": "12:25 PM - 14:35 PM",
     "course": "12:25-13:50",
     "room": "76|2|208",
     "lecturer": "",
@@ -66,7 +53,7 @@
   },
   {
     "day": "Monday",
-    "time": "13:55-16:05",
+    "time": "13:55 PM - 16:05 PM",
     "course": "ALC5012|01|2",
     "room": "14|0|023",
     "lecturer": "",
@@ -92,7 +79,7 @@
   },
   {
     "day": "Tuesday",
-    "time": "10:55-12:20",
+    "time": "10:55 AM - 12:20 PM",
     "course": "MEC12A|01|2",
     "room": "13|1|110",
     "lecturer": "",
@@ -105,7 +92,7 @@
   },
   {
     "day": "Tuesday",
-    "time": "12:25 PM - 14:35",
+    "time": "12:25 PM - 14:35 PM",
     "course": "MEC12A|01|2",
     "room": "13|1|105",
     "lecturer": "",
@@ -118,7 +105,7 @@
   },
   {
     "day": "Tuesday",
-    "time": "14:40-16:50",
+    "time": "14:40 PM - 16:50 PM",
     "course": "MTF12A|01|2",
     "room": "12|1|0139",
     "lecturer": "",
@@ -131,7 +118,7 @@
   },
   {
     "day": "Wednesday",
-    "time": "07:55-09:20",
+    "time": "07:55 AM - 09:20 AM ",
     "course": "MMA12A|01|2",
     "room": "14|1|138",
     "lecturer": "",
@@ -144,7 +131,7 @@
   },
   {
     "day": "Wednesday",
-    "time": "09:25-10:50",
+    "time": "09:25 AM - 10:50 AM",
     "course": "MEM12A|01|2",
     "room": "14|0|027",
     "lecturer": "",
@@ -157,7 +144,7 @@
   },
   {
     "day": "Wednesday",
-    "time": "10:55-12:20",
+    "time": "10:55 AM - 12:20 PM",
     "course": "ALC5012|01|2",
     "room": "14|0|025",
     "lecturer": "",
@@ -170,7 +157,7 @@
   },
   {
     "day": "Wednesday",
-    "time": "12:25-14:35",
+    "time": "12:25 PM - 14:35 PM",
     "course": "MMA12A|01|2",
     "room": "12|1|0141",
     "lecturer": "",
@@ -183,7 +170,7 @@
   },
   {
     "day": "Wednesday",
-    "time": "14:40-16:05",
+    "time": "14:40 PM - 16:05 PM",
     "course": "MEM12A|01|2",
     "room": "13|1|105",
     "lecturer": "",
@@ -209,7 +196,7 @@
   },
   {
     "day": "Thursday",
-    "time": "09:25-10:50",
+    "time": "09:25 AM - 10:50 AM",
     "course": "MAM12A|01|2",
     "room": "13|0|001",
     "lecturer": "",
@@ -222,7 +209,7 @@
   },
   {
     "day": "Thursday",
-    "time": "10:55-12:20",
+    "time": "10:55 AM - 12:20 PM",
     "course": "MEM12A|01|2",
     "room": "12|2|0200",
     "lecturer": "",
@@ -235,7 +222,7 @@
   },
   {
     "day": "Thursday",
-    "time": "13:55-15:20",
+    "time": "13:55 PM - 15:20 PM",
     "course": "MMA12A|01|2",
     "room": "14|0|023",
     "lecturer": "",
@@ -261,7 +248,7 @@
   },
   {
     "day": "Friday",
-    "time": "10:55-12:20",
+    "time": "10:55 AM - 12:20 PM",
     "course": "MEM12A|01|2",
     "room": "20|1|101",
     "lecturer": "",
@@ -274,7 +261,7 @@
   },
   {
     "day": "Friday",
-    "time": "4:40-16:50",
+    "time": "4:40 PM - 16:50 PM",
     "course": "MAM12A|01|2",
     "room": "12|1|0141",
     "lecturer": "",

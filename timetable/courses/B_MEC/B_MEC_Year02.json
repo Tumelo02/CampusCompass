@@ -14,7 +14,7 @@
   },
   {
     "day": "Monday",
-    "time": "13:55-15:20",
+    "time": "13:55 PM - 15:20 PM",
     "course": "MET22A|01|2",
     "room": "14|0|027",
     "lecturer": "",
@@ -27,7 +27,7 @@
   },
   {
     "day": "Tuesday",
-    "time": "08:40-10:50",
+    "time": "08:40 AM - 10:50 AM",
     "course": "MAM22A|01|2",
     "room": "13|1|110",
     "lecturer": "",
@@ -40,7 +40,7 @@
   },
   {
     "day": "Tuesday",
-    "time": "10:55-12:20",
+    "time": "10:55 AM - 12:20 PM",
     "course": "MEN22A|01|2",
     "room": "14|0|026",
     "lecturer": "",
@@ -53,7 +53,7 @@
   },
   {
     "day": "Tuesday",
-    "time": "12:25-14:35",
+    "time": "12:25 PM - 14:35 PM",
     "course": "MET22A|01|2",
     "room": "13|2|205",
     "lecturer": "",
@@ -66,7 +66,7 @@
   },
   {
     "day": "Tuesday",
-    "time": "14:40-16:05",
+    "time": "14:40 PM - 16:05 PM",
     "course": "MPR22A|01|2",
     "room": "14|0|023",
     "lecturer": "",
@@ -79,7 +79,7 @@
   },
   {
     "day": "Wednesday",
-    "time": "07:55-10:05",
+    "time": "07:55 AM - 10:05 AM",
     "course": "MPR22A|01|2",
     "room": "12|1|0100",
     "lecturer": "",
@@ -92,7 +92,7 @@
   },
   {
     "day": "Wednesday",
-    "time": "10:10-12:20",
+    "time": "10:10 AM - 12:20 PM",
     "course": "MMF22A|01|2",
     "room": "13|1|103",
     "lecturer": "",
@@ -105,33 +105,7 @@
   },
   {
     "day": "Wednesday",
-    "time": "10:10-12:20",
-    "course": "MMF22A|01|2",
-    "room": "13|1|105",
-    "lecturer": "",
-    "week_start": "2026-07-21",
-    "group": "#B_MEC|02|1",
-    "program": "B_MEC",
-    "program_name": "BECHELORS lN MECHANICAL Engineering",
-    "year": "02",
-    "semester": "02"
-  },
-  {
-    "day": "Wednesday",
-    "time": "0:10-12:20",
-    "course": "MMF22A|01|2",
-    "room": "14|0|017",
-    "lecturer": "",
-    "week_start": "2026-07-21",
-    "group": "#B_MEC|02|1",
-    "program": "B_MEC",
-    "program_name": "BECHELORS lN MECHANICAL Engineering",
-    "year": "02",
-    "semester": "02"
-  },
-  {
-    "day": "Wednesday",
-    "time": "12:25-14:35",
+    "time": "12:25 PM - 14:35 PM",
     "course": "MEN22A|01|2",
     "room": "13|1|103",
     "lecturer": "",
@@ -144,20 +118,7 @@
   },
   {
     "day": "Wednesday",
-    "time": "12:25-14:35",
-    "course": "MEN22A|01|2",
-    "room": "13|1|105",
-    "lecturer": "",
-    "week_start": "2026-07-21",
-    "group": "#B_MEC|02|1",
-    "program": "B_MEC",
-    "program_name": "BECHELORS lN MECHANICAL Engineering",
-    "year": "02",
-    "semester": "02"
-  },
-  {
-    "day": "Wednesday",
-    "time": "15:25-16:50",
+    "time": "15:25 PM - 16:50 PM",
     "course": "MDE22A|01|2",
     "room": "12|2|0200",
     "lecturer": "",
@@ -170,7 +131,7 @@
   },
   {
     "day": "Thursday",
-    "time": "09:25-10:50",
+    "time": "09:25 AM - 10:50 AM",
     "course": "MET22A|01|2",
     "room": "14|0|028",
     "lecturer": "",
@@ -183,7 +144,7 @@
   },
   {
     "day": "Thursday",
-    "time": "10:55-12:20",
+    "time": "10:55 AM - 12:20 PM",
     "course": "MAM22A|01|2",
     "room": "14|0|021",
     "lecturer": "",
@@ -196,7 +157,7 @@
   },
   {
     "day": "Thursday",
-    "time": "3:10-14:35",
+    "time": "13:10 PM - 14:35 PM",
     "course": "MPR22A|01|2",
     "room": "14|0|026",
     "lecturer": "",
@@ -209,7 +170,7 @@
   },
   {
     "day": "Thursday",
-    "time": "14:40-16:05",
+    "time": "14:40 PM - 16:05 PM",
     "course": "MMF22A|01|2",
     "room": "14|0|027",
     "lecturer": "",
@@ -235,7 +196,7 @@
   },
   {
     "day": "Friday",
-    "time": "10:55-12:20",
+    "time": "10:55 AM - 12:20 PM",
     "course": "MAM22A|01|2",
     "room": "14|0|026",
     "lecturer": "",
@@ -248,7 +209,7 @@
   },
   {
     "day": "Friday",
-    "time": "12:25-13:50",
+    "time": "12:25 PM - 13:50 PM",
     "course": "MDE22A|01|2",
     "room": "12|1|0100",
     "lecturer": "",
@@ -261,7 +222,7 @@
   },
   {
     "day": "Friday",
-    "time": "13:55-16:05",
+    "time": "13:55 PM - 16:05 PM",
     "course": "MDE22A|01|2",
     "room": "12|1|0100",
     "lecturer": "",
