@@ -656,7 +656,8 @@
       return;
     }
     data.courses = data.courses || [];
-    data.courses.push({ code: code, name: '', folder: code, enabled: true, timetable: [] });
+    // `manual` marks this as hand-added so the bundle reconcile keeps it.
+    data.courses.push({ code: code, name: '', folder: code, enabled: true, timetable: [], manual: true });
     setStoredData(data);
     refreshCourseCards();
     openCourseEditor(code);
@@ -1040,13 +1041,17 @@
 
   function initAdminFromBundle() {
     migrateCourseCodes();
-    var d = getStoredData();
-    if (d.courses && d.courses.length) return;
+    // Always reconcile against bundle.json rather than seeding only on a first
+    // visit. The stored copy is a snapshot: when the timetable data changes
+    // (e.g. a new semester), a browser that has visited before would otherwise
+    // keep showing last semester's programs indefinitely.
     fetch('timetable/bundle.json')
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (bundle) {
         var data = getStoredData();
-        if (data.courses && data.courses.length) return;
+        var stored = {};
+        (data.courses || []).forEach(function (c) { stored[c.code] = c; });
+
         var courses = [];
         var lecturers = data.lecturers || {};
         (bundle.programs || []).forEach(function (prog) {
@@ -1057,15 +1062,28 @@
           }
           (prog.years || []).forEach(function (y) {
             var yearNum = parseInt(y.year, 10) || y.year;
+            var code = prog.code + '_' + y.year;
+            var prev = stored[code];
             courses.push({
-              code: prog.code + '_' + y.year,
+              code: code,
               name: prog.name + ' · Year ' + yearNum,
               folder: prog.code,
-              enabled: true,
+              // Visibility is an admin decision, so keep whatever was set here.
+              enabled: prev && typeof prev.enabled === 'boolean' ? prev.enabled : true,
               timetable: Array.isArray(y.timetable) ? y.timetable : []
             });
           });
         });
+
+        // Keep only courses explicitly added by hand in the admin panel. A
+        // stored course that is absent from the bundle and not flagged manual
+        // is a leftover from older timetable data (e.g. last semester's
+        // programs) and must not survive, or removed programs would reappear.
+        (data.courses || []).forEach(function (c) {
+          if (!c || !c.manual) return;
+          if (!courses.some(function (n) { return n.code === c.code; })) courses.push(c);
+        });
+
         data.courses = courses;
         data.lecturers = lecturers;
         setStoredData(data);
