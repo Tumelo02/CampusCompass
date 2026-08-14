@@ -1693,9 +1693,33 @@ body {
     background: var(--surface-elevated);
   }
   .day-header-date { font-size: 0.95rem; }
-  .slot {
+  /* The all-week view stacks days, so the slot area stops being a grid cell.
+     JS assigns it an inline grid-column/row for the desktop layout. */
+  .timetable:not([class*="filter-"]) .day-slot-area {
     grid-column: unset !important;
-    grid-row: unset;
+    grid-row: unset !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    border-right: none;
+  }
+  /* More specific than `.slot` below, so it needs the card padding too or the
+     desktop compact padding wins. */
+  .timetable:not([class*="filter-"]) .day-slot-area .slot {
+    padding: 0.65rem 0.75rem;
+    min-height: auto;
+    overflow: visible;
+  }
+  /* Scoped to the all-week view only: the single-day view below is a real
+     time grid and must keep the inline grid-row JS assigns. */
+  .timetable:not([class*="filter-"]) .slot {
+    grid-column: unset !important;
+    /* JS sets `grid-row: N / span M` inline for the desktop time grid. Without
+       !important that inline value wins here, and every card collapses to the
+       height of its original grid span. */
+    grid-row: unset !important;
+  }
+  .slot {
     border-radius: var(--radius-sm);
     padding: 0.65rem 0.75rem;
     font-size: 0.85rem;
